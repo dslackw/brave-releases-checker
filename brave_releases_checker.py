@@ -13,7 +13,6 @@ import distro
 import requests
 from packaging import version
 
-
 # COLORS
 BOLD = '\033[1m'
 GREEN = '\x1b[32m'
@@ -49,7 +48,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         self.package_name_prefix = self.config['PACKAGE'].get('package_name', 'brave-browser')
         self.log_packages = Path(self.package_path_str)
 
-        self.github_token = self.config['GITHUB']['token']
+        self.github_token = self.config['GITHUB'].get('token', '')
         self.download_url = "https://github.com/brave/brave-browser/releases/download/"
         self.repo = "brave/brave-browser"
         self.headers = {
