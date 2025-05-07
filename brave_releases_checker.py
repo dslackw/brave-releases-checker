@@ -56,8 +56,12 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             "Accept": "application/vnd.github.v3+json",
             "Authorization": f"{self.github_token}"
         }
-        self.username = os.getlogin()
-        self.download_folder = self.config['DOWNLOAD'].get('path', f'/home/{self.username}/Downloads/')
+        download_path_from_config = self.config['DOWNLOAD'].get('path')
+
+        if download_path_from_config:
+            self.download_folder = download_path_from_config
+        else:
+            self.download_folder = os.path.expanduser('~/Downloads/')
 
         self.args = self._parse_arguments()
 
