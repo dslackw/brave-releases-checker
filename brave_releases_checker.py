@@ -95,6 +95,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             'fedora': self._get_installed_version_rpm,
             'centos': self._get_installed_version_rpm,
             'redhat': self._get_installed_version_rpm,
+            'arch': self._get_installed_version_arch
         }
 
         handler = distribution_handlers.get(distribution)
@@ -153,6 +154,24 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
                 sys.exit(1)
         except FileNotFoundError:
             print('{BRED}Error:{ENDC} rpm command not found.')
+            sys.exit(1)
+        return None
+
+    def _get_installed_version_arch(self) -> Union[version.Version, None]:
+        """Gets installed version on Arch Linux."""
+        try:
+            process = subprocess.run(['pacman', '-Qi', self.package_name_prefix], capture_output=True, text=True, check=True)
+            output = process.stdout
+            for line in output.splitlines():
+                if line.startswith('Version        :'):
+                    version_str = line.split(':')[-1].strip()
+                    print(f"Installed Package (Arch): {self.package_name_prefix} - Version: {version_str}")
+                    return version.parse(version_str)
+        except subprocess.CalledProcessError:
+            print(f"Package {self.package_name_prefix} is not installed on this Arch-based system.")
+            sys.exit(1)
+        except FileNotFoundError:
+            print(f"{BRED}Error:{ENDC} pacman command not found.")
             sys.exit(1)
         return None
 
