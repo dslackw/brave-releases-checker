@@ -46,16 +46,19 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
 
         self.package_path_str = self.config['PACKAGE'].get('path', '/var/log/packages/')
         self.package_name_prefix = self.config['PACKAGE'].get('package_name', 'brave-browser')
+        self.github_token = self.config['GITHUB'].get('token', '')
+
         self.log_packages = Path(self.package_path_str)
 
-        self.github_token = self.config['GITHUB'].get('token', '')
         self.download_url = "https://github.com/brave/brave-browser/releases/download/"
         self.repo = "brave/brave-browser"
         self.headers = {
             "Accept": "application/vnd.github.v3+json",
             "Authorization": f"{self.github_token}"
         }
-        self.download_folder = '/home/dslackw/Downloads/'
+        self.username = os.getlogin()
+        self.download_folder = self.config['DOWNLOAD'].get('path', f'/home/{self.username}/Downloads/')
+
         self.args = self._parse_arguments()
 
     def _parse_arguments(self) -> argparse.Namespace:
