@@ -24,7 +24,7 @@ From your command line, use the `brc` script with the appropriate options.
 brc --help
 ```
 
-To check the latest stable releases for the x64 architecture:
+To check the latest stable releases for the amd64 architecture:
 
 ```bash
 brc --channel stable --arch amd64
@@ -44,7 +44,16 @@ brc --channel nightly
 
 ## Configuration
 
-Settings can be modified in the config.ini file located at the root of the project. You can define default download paths, the package name prefix, and your GitHub token (if you want to avoid rate limiting).
+Settings can be modified in the `config.ini` file. The program will search for this file in the following order:
+
+1.  `/etc/brave-releases-checker/config.ini`
+2.  `~/.config/brave-releases-checker/config.ini` (in the user's personal folder)
+
+If a configuration file is not found in either of these locations, default values will be used.
+
+To customize the settings, you can create the `config.ini` (or copy from the project) file in one of these locations. In the case of the second location (`~/.config/brave-releases-checker/config.ini`), you might need to create the `brave-releases-checker` folder inside the `.config` folder of your personal directory first.
+
+You can define default download paths, the package name prefix, and your GitHub token (if you want to avoid rate limiting) within the `config.ini` file.
 
 ## License
 
