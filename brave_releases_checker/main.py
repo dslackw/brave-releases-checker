@@ -41,11 +41,21 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         Initializes the BraveReleaseChecker by reading configuration from config.ini,
         reading the GitHub token, defining URLs, and parsing command-line arguments.
         """
-        self.script_dir = os.path.dirname(os.path.abspath(__file__))
-        self.config_path = '/etc/brave-releases-checker/config.ini'
         self.config = configparser.ConfigParser()
+        config_paths = [
+            '/etc/brave-releases-checker/config.ini',
+            os.path.expanduser('~/.config/brave-releases-checker/config.ini')
+        ]
 
-        if not os.path.exists(self.config_path):
+        config_found = False
+        for path in config_paths:
+            if os.path.exists(path):
+                self.config_path = path
+                self.config.read(self.config_path)
+                config_found = True
+                break
+
+        if not config_found:
             print(f"{BRED}Warning:{ENDC} The config file '{self.config_path}' not found. Default settings will be used.")
             self.package_path_str = '/var/log/packages/'
             self.package_name_prefix = 'brave-browser'
