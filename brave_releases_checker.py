@@ -72,7 +72,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         parser.add_argument('--suffix', default='.deb', choices=['.deb', '.rpm', '.tar.gz', '.apk', '.zip', '.dmg', '.pkg'],
                             help="Asset file suffix to filter")
         parser.add_argument('--arch', default='amd64', choices=['amd64', 'arm64', 'universal'], help="Architecture to filter")
-        parser.add_argument('--download', default=self.download_folder, help="Path to download")
+        parser.add_argument('--download-path', default=self.download_folder, help="Path to download")
         parser.add_argument('--page', type=int, default=1, help="Page number of releases to fetch")
         args = parser.parse_args()
         if args.page < 1:
@@ -202,7 +202,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             tag_version = latest_asset['tag_name']
             latest_version = version.parse(latest_asset['version'])
 
-            download_folder = self.args.download
+            download_folder = self.args.download_path
             if download_folder:
                 self.download_folder = download_folder
 
