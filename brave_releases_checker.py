@@ -188,15 +188,6 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
                         })
         return assets
 
-    def run(self) -> None:
-        """Main method to check and download releases."""
-        installed_version = self._get_installed_version()
-        if installed_version is not None:
-            latest_releases = self._fetch_github_releases()
-            self._check_and_download(installed_version, latest_releases)
-        else:
-            print("Skipping version check and download.")
-
     def _check_and_download(self, installed_version: version.Version, assets: list) -> None:
         """Checks for newer versions and offers to download."""
         if assets:
@@ -247,6 +238,15 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             print("-" * 50)
             print(f"{BOLD}No {self.args.channel.capitalize()} {self.args.suffix} files for {self.args.arch} were found on this page.{ENDC}\n")
             print("=" * 50 + "\n")
+
+    def run(self) -> None:
+        """Main method to check and download releases."""
+        installed_version = self._get_installed_version()
+        if installed_version is not None:
+            latest_releases = self._fetch_github_releases()
+            self._check_and_download(installed_version, latest_releases)
+        else:
+            print("Skipping version check and download.")
 
 
 if __name__ == "__main__":
