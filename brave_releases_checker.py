@@ -72,6 +72,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         parser.add_argument('--suffix', default='.deb', choices=['.deb', '.rpm', '.tar.gz', '.apk', '.zip', '.dmg', '.pkg'],
                             help="Asset file suffix to filter")
         parser.add_argument('--arch', default='amd64', choices=['amd64', 'arm64', 'universal'], help="Architecture to filter")
+        parser.add_argument('--download', default=self.download_folder, help="Path to download")
         parser.add_argument('--page', type=int, default=1, help="Page number of releases to fetch")
         args = parser.parse_args()
         if args.page < 1:
@@ -201,6 +202,10 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             tag_version = latest_asset['tag_name']
             latest_version = version.parse(latest_asset['version'])
 
+            download_folder = self.args.download
+            if download_folder:
+                self.download_folder = download_folder
+
             print("\n" + "=" * 50)
             print(f"{BOLD}Brave Releases Checker{ENDC}")
             print(f"{BOLD}Channel:{ENDC} {self.args.channel.capitalize()}")
@@ -221,12 +226,14 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
                     sys.exit(1)
                 if answer.lower() == 'y':
                     download_url = f'{self.download_url}{tag_version}/{asset_file}'
-                    print(f"\n{BOLD}Downloading:{ENDC} {asset_file} to {self.download_folder}")
+                    print(f"\n{BOLD}Downloading:{ENDC} {asset_file} to:\n"
+                          f"  {self.download_folder}")
                     subprocess.call(
                         f"wget -c -q --tries=3 --progress=bar:force:noscroll --show-progress "
                         f"--directory-prefix={self.download_folder} '{download_url}'", shell=True
                     )
-                    print(f"\n{BGREEN}Download complete!{ENDC} File saved in: {self.download_folder}{asset_file}")
+                    print(f"\n{BGREEN}Download complete!{ENDC} File saved in: \n"
+                          f"  {self.download_folder}{asset_file}")
                 else:
                     print("\nDownload skipped.")
             else:
