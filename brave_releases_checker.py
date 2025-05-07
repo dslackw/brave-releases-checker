@@ -13,6 +13,7 @@ import distro
 import requests
 from packaging import version
 
+
 # COLORS
 BOLD = '\033[1m'
 GREEN = '\x1b[32m'
