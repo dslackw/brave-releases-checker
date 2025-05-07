@@ -352,6 +352,12 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             self._check_and_download(installed_version, latest_releases)
 
 
-if __name__ == "__main__":
+def main() -> None:
+    """Main function.
+    """
     checker = BraveReleaseChecker()
     checker.run()
+
+
+if __name__ == "__main__":
+    main()

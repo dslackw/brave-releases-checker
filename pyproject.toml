@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "brave-releases-checker"
-version = "0.1.1"
+version = "0.1.2"
 authors = [
   { name="Dimitris Zlatanidis", email="dslackw@gmail.com" },
 ]
@@ -23,7 +23,7 @@ dependencies = [
 ]
 
 [project.scripts]
-brc = "brave_releases_checker.main:run"
+brc = "brave_releases_checker.main:main"
 
 [tool.flit.sdist]
 include = ["config.ini"]
