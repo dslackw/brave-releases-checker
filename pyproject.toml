@@ -24,7 +24,7 @@ dependencies = [
 
 [tool.setuptools.entry-points]
 console_scripts = [
-    "brave-releases-checker = brave_releases_checker.main:BraveReleaseChecker().run",
+    "brc = brave_releases_checker.main:BraveReleaseChecker().run",
 ]
 
 [project.data-files]
