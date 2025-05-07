@@ -269,11 +269,23 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
     def run(self) -> None:
         """Main method to check and download releases."""
         installed_version = self._get_installed_version()
-        if installed_version is not None:
+        if installed_version is None:
+            try:
+                answer = input(f'{BRED}Warning:{ENDC} Brave Browser is not installed or its version cannot be determined.\n'
+                               f'\nDo you want to continue and download the latest release? [{BGREEN}y{ENDC}/{BOLD}N{ENDC}] ')
+                if answer.lower() != 'y':
+                    print("Download cancelled by user.")
+                    sys.exit(0)
+                else:
+                    latest_releases = self._fetch_github_releases()
+                    self._check_and_download(version.Version('0.0.0'), latest_releases)  # Pass a dummy version
+                    return
+            except (KeyboardInterrupt, EOFError):
+                print("\nOperation cancelled.")
+                sys.exit(1)
+        else:
             latest_releases = self._fetch_github_releases()
             self._check_and_download(installed_version, latest_releases)
-        else:
-            print("Skipping version check and download.")
 
 
 if __name__ == "__main__":
