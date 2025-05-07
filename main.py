@@ -44,11 +44,23 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
         self.config_path = '/etc/brave-releases-checker/config.ini'
         self.config = configparser.ConfigParser()
-        self.config.read(self.config_path)
 
-        self.package_path_str = self.config['PACKAGE'].get('path', '/var/log/packages/')
-        self.package_name_prefix = self.config['PACKAGE'].get('package_name', 'brave-browser')
-        self.github_token = self.config['GITHUB'].get('token', '')
+        if not os.path.exists(self.config_path):
+            print(f"{BRED}Warning:{ENDC} The config file '{self.config_path}' not found. Default settings will be used.")
+            self.package_path_str = '/var/log/packages/'
+            self.package_name_prefix = 'brave-browser'
+            self.github_token = ''
+            self.download_folder = os.path.expanduser('~/Downloads/')
+        else:
+            self.config.read(self.config_path)
+            self.package_path_str = self.config.get('PACKAGE', 'path', fallback='/var/log/packages/')
+            self.package_name_prefix = self.config.get('PACKAGE', 'package_name', fallback='brave-browser')
+            self.github_token = self.config.get('GITHUB', 'token', fallback='')
+            download_path_from_config = self.config.get('DOWNLOAD', 'path')
+            if download_path_from_config:
+                self.download_folder = download_path_from_config
+            else:
+                self.download_folder = os.path.expanduser('~/Downloads/')
 
         self.log_packages = Path(self.package_path_str)
 
@@ -58,12 +70,6 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             "Accept": "application/vnd.github.v3+json",
             "Authorization": f"{self.github_token}"
         }
-        download_path_from_config = self.config['DOWNLOAD'].get('path')
-
-        if download_path_from_config:
-            self.download_folder = download_path_from_config
-        else:
-            self.download_folder = os.path.expanduser('~/Downloads/')
 
         self.args = self._parse_arguments()
 
