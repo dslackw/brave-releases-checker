@@ -16,7 +16,9 @@ from packaging import version
 # COLORS
 BOLD = '\033[1m'
 GREEN = '\x1b[32m'
+RED = '\x1b[91m'
 BGREEN = f'{BOLD}{GREEN}'
+BRED = f'{BOLD}{RED}'
 ENDC = '\x1b[0m'
 
 
@@ -77,7 +79,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         parser.add_argument('--page', type=int, default=1, help="Page number of releases to fetch")
         args = parser.parse_args()
         if args.page < 1:
-            print("Error: Page number must be a positive integer.")
+            print(f'{BRED}Error{ENDC}: Page number must be a positive integer.')
             sys.exit(1)
         return args
 
@@ -128,7 +130,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             print(f"Package {self.package_name_prefix} is not installed on this Debian-based system.")
             sys.exit(1)
         except FileNotFoundError:
-            print("Error: dpkg command not found.")
+            print('{BRED}Error:{ENDC} dpkg command not found.')
             sys.exit(1)
         return None
 
@@ -147,10 +149,10 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
                 print(f"Package {self.package_name_prefix} is not installed on this RPM-based system.")
                 sys.exit(1)
             else:
-                print(f"Error checking package (RPM): {e}")
+                print(f'{BRED}Error:{ENDC} checking package (RPM): {e}')
                 sys.exit(1)
         except FileNotFoundError:
-            print("Error: rpm command not found.")
+            print('{BRED}Error:{ENDC} rpm command not found.')
             sys.exit(1)
         return None
 
@@ -159,7 +161,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         api_url = f"https://api.github.com/repos/{self.repo}/releases?page={self.args.page}"
         response = requests.get(api_url, headers=self.headers, timeout=10)
         if response.status_code != 200:
-            print(f"Error downloading releases: {response.status_code}, Message: {response.json().get('message')}")
+            print(f"{BRED}Error:{ENDC} downloading releases: {response.status_code}, Message: {response.json().get('message')}")
             sys.exit(1)
 
         releases = response.json()
@@ -193,66 +195,76 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
                         })
         return assets
 
-    def _check_and_download(self, installed_version: version.Version, assets: list) -> None:
+    def _check_and_download(self, installed_version: version.Version, all_found_assets: list) -> None:  # pylint: disable=[R0912,R0915]
         """Checks for newer versions and offers to download."""
-        if assets:
-            assets.sort(key=lambda x: version.parse(x['version']), reverse=True)
-            latest_asset = assets[0]
-            asset_file = latest_asset['asset_name']
-            tag_version = latest_asset['tag_name']
-            latest_version = version.parse(latest_asset['version'])
-            asset_version = self.args.asset_version
-            download_folder = self.args.download_path
+        asset_version_arg = self.args.asset_version
+        download_folder = self.args.download_path
 
-            if asset_version:
-                latest_version = version.parse(asset_version)
+        if download_folder:
+            self.download_folder = download_folder
 
-            if download_folder:
-                self.download_folder = download_folder
+        print("\n" + "=" * 50)
+        print(f"{BOLD}Brave Releases Checker{ENDC}")
+        print(f"{BOLD}Channel:{ENDC} {self.args.channel.capitalize()}")
+        print(f"{BOLD}Architecture:{ENDC} {self.args.arch}")
+        print(f"{BOLD}File Suffix:{ENDC} {self.args.suffix}")
+        print(f"{BOLD}Checking Page:{ENDC} {self.args.page}")
+        print("-" * 50)
+        print(f"{BOLD}Installed Version:{ENDC} v{installed_version}")
+        print("=" * 50)
 
-            print("\n" + "=" * 50)
-            print(f"{BOLD}Brave Releases Checker{ENDC}")
-            print(f"{BOLD}Channel:{ENDC} {self.args.channel.capitalize()}")
-            print(f"{BOLD}Architecture:{ENDC} {self.args.arch}")
-            print(f"{BOLD}File Suffix:{ENDC} {self.args.suffix}")
-            print(f"{BOLD}Checking Page:{ENDC} {self.args.page}")
-            print("-" * 50)
-            print(f"{BOLD}Installed Version:{ENDC} v{installed_version}")
-            print(f"{BOLD}Latest Version Available:{ENDC} v{latest_version} ({latest_asset['asset_name']})")
-            print("=" * 50)
-
-            if latest_version > installed_version:
-                print(f"\n{BGREEN}A newer version is available: v{latest_version}{ENDC}")
-                try:
-                    answer = input(f'\nDo you want to download it? [{BGREEN}y{ENDC}/{BOLD}N{ENDC}] ')
-                except (KeyboardInterrupt, EOFError):
-                    print("\nDownload cancelled.")
-                    sys.exit(1)
-                if answer.lower() == 'y':
-                    download_url = f'{self.download_url}{tag_version}/{asset_file}'
-                    print(f"\n{BOLD}Downloading:{ENDC} {asset_file} to:\n"
-                          f"  {self.download_folder}")
-                    subprocess.call(
-                        f"wget -c -q --tries=3 --progress=bar:force:noscroll --show-progress "
-                        f"--directory-prefix={self.download_folder} '{download_url}'", shell=True
-                    )
-                    print(f"\n{BGREEN}Download complete!{ENDC} File saved in: \n"
-                          f"  {self.download_folder}{asset_file}")
-                else:
-                    print("\nDownload skipped.")
+        filtered_assets = []
+        if asset_version_arg:
+            target_version = version.parse(asset_version_arg)
+            for asset in all_found_assets:
+                if version.parse(asset['version']) == target_version:
+                    filtered_assets.append(asset)
+            if filtered_assets:
+                latest_asset = filtered_assets[0]
             else:
-                print(f"\n{GREEN}Your Brave Browser is up to date!{ENDC} (v{installed_version} is the latest {self.args.channel} version)")
-            print("=" * 50 + "\n")
+                print(f"\n{BRED}Error:{ENDC} No asset found for version v{asset_version_arg} with the specified criteria.")
+                print("=" * 50 + "\n")
+                return
+        elif all_found_assets:
+            all_found_assets.sort(key=lambda x: version.parse(x['version']), reverse=True)
+            latest_asset = all_found_assets[0]
         else:
-            print("\n" + "=" * 50)
-            print(f"{BOLD}Brave Releases Checker{ENDC}")
-            print(f"{BOLD}Channel:{ENDC} {self.args.channel.capitalize()}")
-            print(f"{BOLD}Architecture:{ENDC} {self.args.arch}")
-            print(f"{BOLD}File Suffix:{ENDC} {self.args.suffix}")
-            print(f"{BOLD}Checking Page:{ENDC} {self.args.page}")
-            print("-" * 50)
-            print(f"{BOLD}No {self.args.channel.capitalize()} {self.args.suffix} files for {self.args.arch} were found on this page.{ENDC}\n")
+            print(f"\n{BOLD}No {self.args.channel.capitalize()} {self.args.suffix} files for"
+                  f" {self.args.arch} were found on page {self.args.page}.{ENDC}\n")
             print("=" * 50 + "\n")
+            return
+
+        latest_version = version.parse(latest_asset['version'])
+        asset_file = latest_asset['asset_name']
+        tag_version = latest_asset['tag_name']
+
+        print(f"{BOLD}Latest Version Available:{ENDC} v{latest_version} ({latest_asset['asset_name']})")
+        print("=" * 50)
+
+        if latest_version > installed_version:
+            print(f"\n{BGREEN}A newer version is available: v{latest_version}{ENDC}")
+            try:
+                answer = input(f'\nDo you want to download it? [{BGREEN}y{ENDC}/{BOLD}N{ENDC}] ')
+            except (KeyboardInterrupt, EOFError):
+                print("\nDownload cancelled.")
+                sys.exit(1)
+            if answer.lower() == 'y':
+                download_url = f'{self.download_url}{tag_version}/{asset_file}'
+                print(f"\n{BOLD}Downloading:{ENDC} {asset_file} to:\n"
+                      f"  {self.download_folder}")
+                subprocess.call(
+                    f"wget -c -q --tries=3 --progress=bar:force:noscroll --show-progress "
+                    f"--directory-prefix={self.download_folder} '{download_url}'", shell=True
+                )
+                print(f"\n{BGREEN}Download complete!{ENDC} File saved in: \n"
+                      f"  {self.download_folder}{asset_file}")
+            else:
+                print("\nDownload skipped.")
+        elif asset_version_arg:
+            print(f"\n{GREEN}The specified version (v{latest_version}) matches the latest available.{ENDC}")
+        else:
+            print(f"\n{GREEN}Your Brave Browser is up to date!{ENDC} (v{installed_version} is the latest {self.args.channel} version)")
+        print("=" * 50 + "\n")
 
     def run(self) -> None:
         """Main method to check and download releases."""
