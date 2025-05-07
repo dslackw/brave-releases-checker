@@ -115,8 +115,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             version_str = installed_info.split('-')[2]
             print(f"Installed Package (Slackware): {installed_info}")
             return version.parse(version_str)
-        print(f"No installed version of {self.package_name_prefix} found in {self.package_path_str}.")
-        sys.exit(1)
+        return None
 
     def _get_installed_version_debian(self) -> Union[version.Version, None]:
         """Gets installed version on Debian-based systems."""
