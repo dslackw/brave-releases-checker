@@ -1,0 +1,60 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions (for Linux, Windows and macOS)
+*.so
+*.pyd
+*.dll
+*.dylib
+
+# Unit test / coverage reports
+.coverage
+coverage.xml
+htmlcov/
+.pytest_cache/
+
+# Environments
+.venv/
+venv/
+env/
+envs/
+ENV/
+conda-env/
+
+# IDE-specific files
+.idea/
+.project
+.workspace
+*.swp
+*.swo
+*.iml
+nbproject/
+.vscode/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# MyPy cache
+.mypy_cache/
+
+# Flit build artifacts
+dist/
+build/
+*.egg-info/
+
+# Python Eggs
+*.egg
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.bak
+*.orig
