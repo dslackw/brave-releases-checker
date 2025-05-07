@@ -200,7 +200,8 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
     def _fetch_github_releases(self) -> list:
         """Fetches Brave Browser releases from GitHub API based on criteria."""
         api_url = f"https://api.github.com/repos/{self.repo}/releases?page={self.args.page}"
-        print(f"{BOLD}Connecting to GitHub...{ENDC}")
+        sys.stdout.write(f"{BOLD}Connecting to GitHub... {ENDC}")
+        sys.stdout.flush()
         try:
             response = requests.get(api_url, headers=self.headers, timeout=10)
             response.raise_for_status()  # Raise an exception for bad status codes (4xx or 5xx)
