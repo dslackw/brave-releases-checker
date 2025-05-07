@@ -6,7 +6,7 @@ build-backend = "flit_core.buildapi"
 name = "brave-releases-checker"
 version = "0.1.0"
 authors = [
-  { name="Your Name", email="your.email@example.com" },
+  { name="Dimitris Zlatanidis", email="dslackw@gmail.com" },
 ]
 description = "Checks for new Brave Browser releases"
 readme = "README.md"
