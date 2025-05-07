@@ -22,10 +22,8 @@ dependencies = [
     "distro",
 ]
 
-[tool.setuptools.entry-points]
-console_scripts = [
-    "brc = brave_releases_checker.main:BraveReleaseChecker().run",
-]
+[project.scripts]
+brc = "brave_releases_checker.main:run"
 
 [tool.flit.sdist]
 include = ["config.ini"]
