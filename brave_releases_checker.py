@@ -95,7 +95,8 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             'fedora': self._get_installed_version_rpm,
             'centos': self._get_installed_version_rpm,
             'redhat': self._get_installed_version_rpm,
-            'arch': self._get_installed_version_arch
+            'arch': self._get_installed_version_arch,
+            'opensuse': self._get_installed_version_opensuse,
         }
 
         handler = distribution_handlers.get(distribution)
@@ -172,6 +173,28 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             sys.exit(1)
         except FileNotFoundError:
             print(f"{BRED}Error:{ENDC} pacman command not found.")
+            sys.exit(1)
+        return None
+
+    def _get_installed_version_opensuse(self) -> Union[version.Version, None]:
+        """Gets installed version on openSUSE."""
+        try:
+            process = subprocess.run(['zypper', 'info', self.package_name_prefix], capture_output=True, text=True, check=True)
+            output = process.stdout
+            for line in output.splitlines():
+                if line.startswith('Version: '):
+                    version_str = line.split(':')[-1].strip()
+                    print(f"Installed Package (openSUSE): {self.package_name_prefix} - Version: {version_str}")
+                    return version.parse(version_str)
+        except subprocess.CalledProcessError as e:
+            if f"Information for package '{self.package_name_prefix}' not found." in e.stderr:
+                print(f"Package {self.package_name_prefix} is not installed on this openSUSE system.")
+                sys.exit(1)
+            else:
+                print(f"{BRED}Error:{ENDC} checking package (openSUSE): {e}")
+                sys.exit(1)
+        except FileNotFoundError:
+            print(f"{BRED}Error:{ENDC} zypper command not found.")
             sys.exit(1)
         return None
 
