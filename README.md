@@ -26,8 +26,14 @@ brc --help
 
 To check the latest stable releases for the x64 architecture:
 
-```Bash
+```bash
 brc --channel stable --arch amd64
+```
+
+or just type:
+
+```bash
+brc
 ```
 
 To check the latest nightly releases:
