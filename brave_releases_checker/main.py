@@ -2,77 +2,36 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import configparser
-import os
 import subprocess
 import sys
-from pathlib import Path
 from typing import Union
 
 import distro
 import requests
 from packaging import version
 
-# COLORS
-BOLD = '\033[1m'
-GREEN = '\x1b[32m'
-RED = '\x1b[91m'
-BGREEN = f'{BOLD}{GREEN}'
-BRED = f'{BOLD}{RED}'
-ENDC = '\x1b[0m'
+from brave_releases_checker.config import Colors, load_config
 
 
 class BraveReleaseChecker:  # pylint: disable=R0902,R0903
     """
     Checks for new Brave Browser releases on GitHub, compares with the installed version,
     and offers to download the latest release based on specified criteria.
-
-    This class provides functionality to:
-    - Parse command-line arguments for release channel, file suffix, architecture, and page number.
-    - Read a GitHub token from a .env file for authenticated API requests.
-    - Determine the locally installed Brave Browser version (currently assumes Linux packages in /var/log/packages).
-    - Fetch the latest Brave Browser releases from the GitHub API, filtering by channel, suffix, and architecture.
-    - Compare the latest available version with the installed version.
-    - If a newer version is found, prompt the user to download it using wget.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
-        Initializes the BraveReleaseChecker by reading configuration from config.ini,
-        reading the GitHub token, defining URLs, and parsing command-line arguments.
+        Initializes the BraveReleaseChecker by loading configuration, defining URLs,
+        setting headers for GitHub API requests, and parsing command-line arguments.
         """
-        self.config = configparser.ConfigParser()
-        config_paths = [
-            '/etc/brave-releases-checker/config.ini',
-            os.path.expanduser('~/.config/brave-releases-checker/config.ini')
-        ]
-
-        config_found = False
-        for path in config_paths:
-            if os.path.exists(path):
-                self.config_path = path
-                self.config.read(self.config_path)
-                config_found = True
-                break
-
-        if not config_found:
-            print(f"{BRED}Warning:{ENDC} The config file '{self.config_path}' not found. Default settings will be used.")
-            self.package_path_str = '/var/log/packages/'
-            self.package_name_prefix = 'brave-browser'
-            self.github_token = ''
-            self.download_folder = os.path.expanduser('~/Downloads/')
-        else:
-            self.config.read(self.config_path)
-            self.package_path_str = self.config.get('PACKAGE', 'path', fallback='/var/log/packages/')
-            self.package_name_prefix = self.config.get('PACKAGE', 'package_name', fallback='brave-browser')
-            self.github_token = self.config.get('GITHUB', 'token', fallback='')
-            download_path_from_config = self.config.get('DOWNLOAD', 'path')
-            if download_path_from_config:
-                self.download_folder = download_path_from_config
-            else:
-                self.download_folder = os.path.expanduser('~/Downloads/')
-
-        self.log_packages = Path(self.package_path_str)
+        config = load_config()
+        self.config_path = config.config_path
+        self.package_path_str = str(config.package_path)
+        self.package_name_prefix = config.package_name_prefix
+        self.github_token = config.github_token
+        self.download_folder = str(config.download_folder)
+        self.log_packages = config.package_path
+        self.color = Colors()
 
         self.download_url = "https://github.com/brave/brave-browser/releases/download/"
         self.repo = "brave/brave-browser"
@@ -95,7 +54,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         parser.add_argument('--page', type=int, default=1, help="Page number of releases to fetch")
         args = parser.parse_args()
         if args.page < 1:
-            print(f'{BRED}Error{ENDC}: Page number must be a positive integer.')
+            print(f'{self.color.bred}Error{self.color.endc}: Page number must be a positive integer.')
             sys.exit(1)
         return args
 
@@ -166,7 +125,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
                 print(f"Package {self.package_name_prefix} is not installed on this RPM-based system.")
                 sys.exit(1)
             else:
-                print(f'{BRED}Error:{ENDC} checking package (RPM): {e}')
+                print(f'{self.color.bred}Error:{self.color.endc} checking package (RPM): {e}')
                 sys.exit(1)
         except FileNotFoundError:
             print('{BRED}Error:{ENDC} rpm command not found.')
@@ -187,7 +146,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             print(f"Package {self.package_name_prefix} is not installed on this Arch-based system.")
             sys.exit(1)
         except FileNotFoundError:
-            print(f"{BRED}Error:{ENDC} pacman command not found.")
+            print(f"{self.color.bred}Error:{self.color.endc} pacman command not found.")
             sys.exit(1)
         return None
 
@@ -206,26 +165,26 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
                 print(f"Package {self.package_name_prefix} is not installed on this openSUSE system.")
                 sys.exit(1)
             else:
-                print(f"{BRED}Error:{ENDC} checking package (openSUSE): {e}")
+                print(f"{self.color.bred}Error:{self.color.endc} checking package (openSUSE): {e}")
                 sys.exit(1)
         except FileNotFoundError:
-            print(f"{BRED}Error:{ENDC} zypper command not found.")
+            print(f"{self.color.bred}Error:{self.color.endc} zypper command not found.")
             sys.exit(1)
         return None
 
     def _fetch_github_releases(self) -> list:
         """Fetches Brave Browser releases from GitHub API based on criteria."""
         api_url = f"https://api.github.com/repos/{self.repo}/releases?page={self.args.page}"
-        sys.stdout.write(f"{BOLD}Connecting to GitHub... {ENDC}")
+        sys.stdout.write(f"{self.color.bold}Connecting to GitHub... {self.color.endc}")
         sys.stdout.flush()
         try:
             response = requests.get(api_url, headers=self.headers, timeout=10)
             response.raise_for_status()  # Raise an exception for bad status codes (4xx or 5xx)
         except requests.exceptions.Timeout:
-            print(f"{BRED}Error:{ENDC} Connection to GitHub timed out.")
+            print(f"{self.color.bred}Error:{self.color.endc} Connection to GitHub timed out.")
             sys.exit(1)
         except requests.exceptions.RequestException as e:
-            print(f"{BRED}Error:{ENDC} Failed to download releases from GitHub: {e}")
+            print(f"{self.color.bred}Error:{self.color.endc} Failed to download releases from GitHub: {e}")
             sys.exit(1)
 
         releases = response.json()
@@ -268,13 +227,13 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             self.download_folder = download_folder
 
         print("\n" + "=" * 50)
-        print(f"{BOLD}Brave Releases Checker{ENDC}")
-        print(f"{BOLD}Channel:{ENDC} {self.args.channel.capitalize()}")
-        print(f"{BOLD}Architecture:{ENDC} {self.args.arch}")
-        print(f"{BOLD}File Suffix:{ENDC} {self.args.suffix}")
-        print(f"{BOLD}Checking Page:{ENDC} {self.args.page}")
+        print(f"{self.color.bold}Brave Releases Checker{self.color.endc}")
+        print(f"{self.color.bold}Channel:{self.color.endc} {self.args.channel.capitalize()}")
+        print(f"{self.color.bold}Architecture:{self.color.endc} {self.args.arch}")
+        print(f"{self.color.bold}File Suffix:{self.color.endc} {self.args.suffix}")
+        print(f"{self.color.bold}Checking Page:{self.color.endc} {self.args.page}")
         print("-" * 50)
-        print(f"{BOLD}Installed Version:{ENDC} v{installed_version}")
+        print(f"{self.color.bold}Installed Version:{self.color.endc} v{installed_version}")
         print("=" * 50)
 
         filtered_assets = []
@@ -286,15 +245,15 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             if filtered_assets:
                 latest_asset = filtered_assets[0]
             else:
-                print(f"\n{BRED}Error:{ENDC} No asset found for version v{asset_version_arg} with the specified criteria.")
+                print(f"\n{self.color.bred}Error:{self.color.endc} No asset found for version v{asset_version_arg} with the specified criteria.")
                 print("=" * 50 + "\n")
                 return
         elif all_found_assets:
             all_found_assets.sort(key=lambda x: version.parse(x['version']), reverse=True)
             latest_asset = all_found_assets[0]
         else:
-            print(f"\n{BOLD}No {self.args.channel.capitalize()} {self.args.suffix} files for"
-                  f" {self.args.arch} were found on page {self.args.page}.{ENDC}\n")
+            print(f"\n{self.color.bold}No {self.args.channel.capitalize()} {self.args.suffix} files for"
+                  f" {self.args.arch} were found on page {self.args.page}.{self.color.endc}\n")
             print("=" * 50 + "\n")
             return
 
@@ -302,32 +261,33 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         asset_file = latest_asset['asset_name']
         tag_version = latest_asset['tag_name']
 
-        print(f"{BOLD}Latest Version Available:{ENDC} v{latest_version} ({latest_asset['asset_name']})")
+        print(f"{self.color.bold}Latest Version Available:{self.color.endc} v{latest_version} ({latest_asset['asset_name']})")
         print("=" * 50)
 
         if latest_version > installed_version:
-            print(f"\n{BGREEN}A newer version is available: v{latest_version}{ENDC}")
+            print(f"\n{self.color.bgreen}A newer version is available: v{latest_version}{self.color.endc}")
             try:
-                answer = input(f'\nDo you want to download it? [{BGREEN}y{ENDC}/{BOLD}N{ENDC}] ')
+                answer = input(f'\nDo you want to download it? [{self.color.bgreen}y{self.color.endc}/{self.color.bold}N{self.color.endc}] ')
             except (KeyboardInterrupt, EOFError):
                 print("\nDownload cancelled.")
                 sys.exit(1)
             if answer.lower() == 'y':
                 download_url = f'{self.download_url}{tag_version}/{asset_file}'
-                print(f"\n{BOLD}Downloading:{ENDC} {asset_file} to:\n"
+                print(f"\n{self.color.bold}Downloading:{self.color.endc} {asset_file} to:\n"
                       f"  {self.download_folder}")
                 subprocess.call(
                     f"wget -c -q --tries=3 --progress=bar:force:noscroll --show-progress "
                     f"--directory-prefix={self.download_folder} '{download_url}'", shell=True
                 )
-                print(f"\n{BGREEN}Download complete!{ENDC} File saved in: \n"
+                print(f"\n{self.color.bgreen}Download complete!{self.color.endc} File saved in: \n"
                       f"  {self.download_folder}{asset_file}")
             else:
                 print("\nDownload skipped.")
         elif asset_version_arg:
-            print(f"\n{GREEN}The specified version (v{latest_version}) matches the latest available.{ENDC}")
+            print(f"\n{self.color.green}The specified version (v{latest_version}) matches the latest available.{self.color.endc}")
         else:
-            print(f"\n{GREEN}Your Brave Browser is up to date!{ENDC} (v{installed_version} is the latest {self.args.channel} version)")
+            print(f'\n{self.color.green}Your Brave Browser is up to date!{self.color.endc} '
+                  f'(v{installed_version} is the latest {self.args.channel} version)')
         print("=" * 50 + "\n")
 
     def run(self) -> None:
@@ -335,8 +295,9 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         installed_version = self._get_installed_version()
         if installed_version is None:
             try:
-                answer = input(f'{BRED}Warning:{ENDC} Brave Browser is not installed or its version cannot be determined.\n'
-                               f'\nDo you want to continue and download the latest release? [{BGREEN}y{ENDC}/{BOLD}N{ENDC}] ')
+                answer = input(f'{self.color.bred}Warning:{self.color.endc} Brave Browser is not installed or its version cannot be determined.\n'
+                               f'\nDo you want to continue and download the latest release? '
+                               f'[{self.color.bgreen}y{self.color.endc}/{self.color.bold}N{self.color.endc}] ')
                 if answer.lower() != 'y':
                     print("Download cancelled by user.")
                     sys.exit(0)
@@ -353,7 +314,11 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
 
 
 def main() -> None:
-    """Main function.
+    """
+    The main entry point of the Brave Release Checker script.
+
+    It creates an instance of the BraveReleaseChecker class and initiates the
+    process of checking for and potentially downloading new Brave Browser releases.
     """
     checker = BraveReleaseChecker()
     checker.run()
