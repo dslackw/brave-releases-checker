@@ -130,15 +130,13 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             process = subprocess.run(['snap', 'info', 'brave'], capture_output=True, text=True, check=True)
             output = process.stdout
             version_str = None
-            found_installed = False
             for line in output.splitlines():
                 if line.startswith('installed:'):
-                    found_installed = True
                     version_str = line.split()[1]
                     print(f"Installed Package (Snap): brave - Version: {version_str}")
                     return version.parse(version_str)
 
-            if not found_installed:
+            if not version_str:
                 print("Could not find installed version information in snap info output.")
                 return None
         except subprocess.CalledProcessError as e:
