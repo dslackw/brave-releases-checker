@@ -2,4 +2,4 @@
 # -*- coding: utf-8 -*-
 
 
-__version__: str = '0.1.3'
+__version__: str = '0.1.4'
