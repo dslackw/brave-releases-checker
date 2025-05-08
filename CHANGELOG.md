@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Fixed
+- Fixed Snap package version detection:** Corrected the method for extracting the installed Brave Browser version from Snap packages on Ubuntu, ensuring accurate version retrieval when Brave is installed via Snap.
+
 ## [0.1.4] - 2025-05-08
 ### Added
 - **Added Snap support for Ubuntu:** Implemented functionality to detect the installed Brave Browser version on Ubuntu systems where it is installed as a Snap package. The tool will now attempt to retrieve the version using `snap info brave` if the standard Debian package check (`dpkg`) fails.

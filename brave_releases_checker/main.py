@@ -134,13 +134,11 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             for line in output.splitlines():
                 if line.startswith('installed:'):
                     found_installed = True
-                    continue
-                if found_installed and line.strip():  # Get the first non-empty line after 'installed:'
-                    version_str = line.strip()
+                    version_str = line.split()[1]
                     print(f"Installed Package (Snap): brave - Version: {version_str}")
                     return version.parse(version_str)
 
-            if not version_str:
+            if not found_installed:
                 print("Could not find installed version information in snap info output.")
                 return None
         except subprocess.CalledProcessError as e:
