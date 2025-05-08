@@ -16,10 +16,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed an issue where the 'brc' console script was not being correctly registered during installation.
 
-## [0.1.2] - 2025-05-08
-### Fixed
-- Fixed an issue where the 'brc' console script was not being correctly registered during installation.
-
 ## [0.1.1] - 2025-05-07
 ### Fixed
 - Fixed an issue where the 'brc' console script was not being correctly registered during installation.
