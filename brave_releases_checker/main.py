@@ -95,7 +95,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         return None
 
     def _get_installed_version_debian(self) -> Union[version.Version, None]:
-        """Gets installed version on Debian-based systems."""
+        """Gets installed version on Debian-based systems, with fallback to snap on Ubuntu."""
         try:
             process = subprocess.run(['dpkg', '-s', self.package_name_prefix], capture_output=True, text=True, check=True)
             output = process.stdout
@@ -104,12 +104,54 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
                     version_str = line.split(':')[-1].strip()
                     print(f"Installed Package (Debian): {self.package_name_prefix} - Version: {version_str}")
                     return version.parse(version_str)
+            # If we reach here, dpkg didn't find the package or the Version line
+            print(f"Package {self.package_name_prefix} not found or version info missing via dpkg.")
         except subprocess.CalledProcessError:
-            print(f"Package {self.package_name_prefix} is not installed on this Debian-based system.")
-            sys.exit(1)
+            print(f"Package {self.package_name_prefix} is not installed on this Debian-based system (via dpkg).")
         except FileNotFoundError:
-            print('{BRED}Error:{ENDC} dpkg command not found.')
-            sys.exit(1)
+            print(f'{self.color.bred}Error:{self.color.endc} dpkg command not found.')
+            return None  # dpkg not available, cannot proceed with debian check
+
+        # Fallback to snap if on Ubuntu
+        if distro.id().lower() == 'ubuntu':
+            try:
+                subprocess.run(['which', 'snap'], check=True, capture_output=True)
+                print("Attempting to get version via snap...")
+                return self._get_installed_version_snap()
+            except (subprocess.CalledProcessError, FileNotFoundError):
+                print("snap command not found or not available.")
+                return None
+
+        return None
+
+    def _get_installed_version_snap(self) -> Union[version.Version, None]:
+        """Gets installed version on systems with snapd where Brave is installed as a snap."""
+        try:
+            process = subprocess.run(['snap', 'info', 'brave'], capture_output=True, text=True, check=True)
+            output = process.stdout
+            version_str = None
+            found_installed = False
+            for line in output.splitlines():
+                if line.startswith('installed:'):
+                    found_installed = True
+                    continue
+                if found_installed and line.strip():  # Get the first non-empty line after 'installed:'
+                    version_str = line.strip()
+                    print(f"Installed Package (Snap): brave - Version: {version_str}")
+                    return version.parse(version_str)
+
+            if not version_str:
+                print("Could not find installed version information in snap info output.")
+                return None
+        except subprocess.CalledProcessError as e:
+            if "error: unknown snap \"brave\"" in e.stderr:
+                print("Brave Browser is not installed as a snap.")
+                return None
+            print(f'{self.color.bred}Error:{self.color.endc} checking snap package: {e}')
+            return None
+        except FileNotFoundError:
+            print(f'{self.color.bred}Error:{self.color.endc} snap command not found.')
+            return None
         return None
 
     def _get_installed_version_rpm(self) -> Union[version.Version, None]:
