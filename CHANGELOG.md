@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Introduced a `Colors` `dataclass` within `config.py` to manage ANSI escape codes for terminal colors and styles, enhancing the visual output of the application.
+- **Added `--version` option:** Implemented a command-line option to display the current version of the Brave Releases Checker.
 
 ## [0.1.2] - 2025-05-08
 ### Fixed

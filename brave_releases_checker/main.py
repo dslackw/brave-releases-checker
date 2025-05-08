@@ -11,6 +11,7 @@ import requests
 from packaging import version
 
 from brave_releases_checker.config import Colors, load_config
+from brave_releases_checker.version import __version__
 
 
 class BraveReleaseChecker:  # pylint: disable=R0902,R0903
@@ -52,6 +53,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         parser.add_argument('--download-path', default=self.download_folder, help="Path to download")
         parser.add_argument('--asset-version', help="Specify the asset version")
         parser.add_argument('--page', type=int, default=1, help="Page number of releases to fetch")
+        parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
         args = parser.parse_args()
         if args.page < 1:
             print(f'{self.color.bred}Error{self.color.endc}: Page number must be a positive integer.')
