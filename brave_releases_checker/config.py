@@ -73,7 +73,7 @@ def load_config() -> Config:
             break
 
     if not config_found:
-        print(f"{color.bred}Warning:{color.endc} The config file not found. Default settings will be used.")
+        print(f'{color.bred}Warning:{color.endc} The config file not found. Default settings will be used.')
         return Config(config_path=found_config_path)
 
     download_path_from_config = config_parser.get('DEFAULT', 'download_path', fallback=None)
