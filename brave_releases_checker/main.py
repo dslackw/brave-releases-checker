@@ -26,19 +26,20 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         setting headers for GitHub API requests, and parsing command-line arguments.
         """
         config = load_config()
-        self.config_path = config.config_path
-        self.package_path_str = str(config.package_path)
         self.package_name_prefix = config.package_name_prefix
-        self.github_token = config.github_token
         self.download_folder = str(config.download_folder)
         self.log_packages = config.package_path
+        self.channel = config.channel
+        self.asset_suffix = config.asset_suffix
+        self.asset_arch = config.asset_arch
+        self.page = int(config.page)
         self.color = Colors()
 
         self.download_url = "https://github.com/brave/brave-browser/releases/download/"
         self.repo = "brave/brave-browser"
         self.headers = {
             "Accept": "application/vnd.github.v3+json",
-            "Authorization": f"{self.github_token}"
+            "Authorization": f"{config.github_token}"
         }
 
         self.args = self._parse_arguments()
@@ -46,13 +47,13 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
     def _parse_arguments(self) -> argparse.Namespace:
         """Parses command-line arguments."""
         parser = argparse.ArgumentParser(description="Check and download Brave Browser releases.")
-        parser.add_argument('--channel', default='stable', choices=['stable', 'beta', 'nightly'], help="Release channel to check")
-        parser.add_argument('--suffix', default='.deb', choices=['.deb', '.rpm', '.tar.gz', '.apk', '.zip', '.dmg', '.pkg'],
+        parser.add_argument('--channel', default=self.channel, choices=['stable', 'beta', 'nightly'], help="Release channel to check")
+        parser.add_argument('--suffix', default=self.asset_suffix, choices=['.deb', '.rpm', '.tar.gz', '.apk', '.zip', '.dmg', '.pkg'],
                             help="Asset file suffix to filter")
-        parser.add_argument('--arch', default='amd64', choices=['amd64', 'arm64', 'aarch64', 'x86_64'], help="Architecture to filter")
+        parser.add_argument('--arch', default=self.asset_arch, choices=['amd64', 'arm64', 'aarch64', 'x86_64'], help="Architecture to filter")
         parser.add_argument('--download-path', default=self.download_folder, help="Path to download")
         parser.add_argument('--asset-version', help="Specify the asset version")
-        parser.add_argument('--page', type=int, default=1, help="Page number of releases to fetch")
+        parser.add_argument('--page', type=int, default=self.page, help="Page number of releases to fetch")
         parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
         args = parser.parse_args()
         if args.page < 1:

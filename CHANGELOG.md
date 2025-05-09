@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Fixed
 - **Fixed for config path:** Corrected to check config.ini file if exists instead the path of the config.ini.
+### Added
+- **Added default configs:** Improved the configurations passed the default values into the config.ini file.
 
 ## [0.1.7] - 2025-05-09
 ### Fixed

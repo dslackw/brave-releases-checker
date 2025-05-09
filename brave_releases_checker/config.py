@@ -22,7 +22,7 @@ class Colors:
 
 
 @dataclass
-class Config:
+class Config:  # pylint: disable=[R0902]
     """
     Represents the configuration settings for the Brave Release Checker.
 
@@ -37,6 +37,10 @@ class Config:
     package_name_prefix: str = 'brave-browser'
     github_token: str = ''
     download_folder: Path = Path(os.path.expanduser('~/Downloads/'))
+    channel: str = 'stable'
+    asset_suffix: str = '.deb'
+    asset_arch: str = '.amd64'
+    page: str = '1'
     config_path: Union[str, None] = None
 
 
@@ -72,11 +76,15 @@ def load_config() -> Config:
         print(f"{color.bred}Warning:{color.endc} The config file not found. Default settings will be used.")
         return Config(config_path=found_config_path)
 
-    download_path_from_config = config_parser.get('DOWNLOAD', 'path', fallback=None)
+    download_path_from_config = config_parser.get('DEFAULT', 'download_path', fallback=None)
     return Config(
         package_path=Path(config_parser.get('PACKAGE', 'path', fallback='/var/log/packages/')),
         package_name_prefix=config_parser.get('PACKAGE', 'package_name', fallback='brave-browser'),
         github_token=config_parser.get('GITHUB', 'token', fallback=''),
         download_folder=Path(download_path_from_config) if download_path_from_config else Path(os.path.expanduser('~/Downloads/')),
+        channel=config_parser.get('DEFAULT', 'channel', fallback='stable'),
+        asset_suffix=config_parser.get('DEFAULT', 'suffix', fallback='.deb'),
+        asset_arch=config_parser.get('DEFAULT', 'arch', fallback='amd64'),
+        page=config_parser.get('DEFAULT', '1', fallback='1'),
         config_path=found_config_path
     )
