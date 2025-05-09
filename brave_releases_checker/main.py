@@ -207,24 +207,29 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
     def _fetch_github_releases(self) -> list:
         """Fetches Brave Browser releases from GitHub API based on criteria."""
         all_assets: list = []
+        total_pages = self.args.end_page - self.args.start_page + 1
 
-        for page in range(self.args.start_page, self.args.end_page + 1):
-            api_url = f'https://api.github.com/repos/{self.repo}/releases?page={page}'
-            sys.stdout.write(f'{self.color.bold}Connecting to GitHub (Page {page})... {self.color.endc}')
+        for _, page in enumerate(range(self.args.start_page, self.args.end_page + 1)):
+            status_message = f"{self.color.bold}Connecting to GitHub (Page {page}/{total_pages})... {self.color.endc}"
+            sys.stdout.write(f"\r{status_message}")  # Use \r to overwrite the previous line
             sys.stdout.flush()
             try:
-                response = requests.get(api_url, headers=self.headers, timeout=10)
-                response.raise_for_status()  # Raise an exception for bad status codes (4xx or 5xx)
+                response = requests.get(f"https://api.github.com/repos/{self.repo}/releases?page={page}", headers=self.headers, timeout=10)
+                response.raise_for_status()
                 releases = response.json()
                 self._process_releases_for_page(releases, all_assets)
             except requests.exceptions.Timeout:
-                print(f'{self.color.bred}Error:{self.color.endc} Connection to GitHub (Page {page}) timed out.')
+                sys.stdout.write(f"\r{self.color.bred}Error:{self.color.endc} Connection to GitHub (Page {page}) timed out.{" " * 40}\n")
+                sys.stdout.flush()
                 sys.exit(1)
             except requests.exceptions.RequestException as e:
-                print(f'{self.color.bred}Error:{self.color.endc} Failed to download releases from GitHub (Page {page}): {e}')
+                sys.stdout.write(f"\r{self.color.bred}Error:{self.color.endc} Failed to download releases from GitHub (Page {page}): {e}{" " * 40}\n")
+                sys.stdout.flush()
                 sys.exit(1)
-            print('Done')
 
+        sys.stdout.write(f'\r{self.color.bold}Connecting to GitHub (Pages {self.args.start_page}-{self.args.end_page})... '
+                         f'{self.color.bgreen}Done{self.color.endc}{" " * 40}\n')
+        sys.stdout.flush()
         return all_assets
 
     def _process_releases_for_page(self, releases: list, all_assets: list) -> None:
