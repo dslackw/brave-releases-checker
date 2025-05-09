@@ -32,7 +32,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         self.channel = config.channel
         self.asset_suffix = config.asset_suffix
         self.asset_arch = config.asset_arch
-        self.pages = int(config.pages)
+        self.pages = config.pages
         self.color = Colors()
 
         self.download_url = 'https://github.com/brave/brave-browser/releases/download/'
