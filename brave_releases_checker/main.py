@@ -152,24 +152,15 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
 
     def _get_installed_version_rpm(self) -> Union[version.Version, None]:
         """Gets installed version on RPM-based systems."""
-        try:
-            process = subprocess.run(['rpm', '-qi', self.package_name_prefix], capture_output=True, text=True, check=True)
+        process = subprocess.run(['dnf', 'list', self.package_name_prefix], capture_output=True, text=True, check=False)
+        if process.returncode == 0:
             output = process.stdout
             for line in output.splitlines():
-                if line.startswith('Version        :'):
-                    version_str = line.split(':')[-1].strip()
+                if line.startswith(self.package_name_prefix):
+                    version_str = line.split()[1].split('-')[0]
                     print(f"Installed Package (RPM): {self.package_name_prefix} - Version: {version_str}")
                     return version.parse(version_str)
-            # If we reach here, rpm didn't find the package or the Version line
-            print(f"{self.color.red}Warning:{self.color.endc} Package {self.package_name_prefix} not found or version info missing via rpm.")
-        except subprocess.CalledProcessError as e:
-            if f"package {self.package_name_prefix} is not installed" in e.stderr:
-                print(f"{self.color.red}Warning:{self.color.endc} Package {self.package_name_prefix} is not installed on this RPM-based system.")
-            else:
-                print(f'{self.color.bred}Error:{self.color.endc} checking package (RPM): {e}')
-        except FileNotFoundError:
-            print('{BRED}Error:{ENDC} rpm command not found.')
-            return None
+        print(f"{self.color.red}Warning:{self.color.endc} Package {self.package_name_prefix} not found or version info missing via rpm.")
         return None
 
     def _get_installed_version_arch(self) -> Union[version.Version, None]:
