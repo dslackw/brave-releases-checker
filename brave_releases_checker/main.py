@@ -73,7 +73,8 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             'centos': self._get_installed_version_dnf,
             'redhat': self._get_installed_version_dnf,
             'arch': self._get_installed_version_arch,
-            'opensuse': self._get_installed_version_opensuse,
+            'opensuse-tumbleweed': self._get_installed_version_opensuse,
+            'opensuse-leap': self._get_installed_version_opensuse,
         }
 
         handler = distribution_handlers.get(distribution)
