@@ -135,7 +135,6 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
                     version_str = line.split()[1]
                     print(f"Installed Package (Snap): brave - Version: {version_str}")
                     return version.parse(version_str)
-
             if not version_str:
                 print("Could not find installed version information in snap info output.")
                 return None
