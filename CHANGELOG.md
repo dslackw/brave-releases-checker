@@ -8,8 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Fixed
 - Fixed rpm return exit code:** Corrected the method for extracting the installed Brave Browser version from rpm packages on Fedora.
-- ### Added
+### Added
 - **Added support:** Arch x86_64 for .rpm packages.
+### Updated
+- **Updated command:** Replaced command rpm with dnf to find the package installed and grab version.
 
 ## [0.1.5] - 2025-05-08
 ### Fixed
