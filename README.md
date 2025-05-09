@@ -62,3 +62,15 @@ This project is licensed under the MIT License.
 ## Contributing
 
 Contributions are welcome! Feel free to report issues or submit pull requests to the repository.
+
+**Regarding Unsupported Distributions:**
+
+This tool has been primarily tested on Debian-based (using `apt` and `snap`), Fedora (using `dnf`), Arch-based (using `pacman`), openSUSE (using `zypper`), and Slackware systems.
+
+If you encounter issues or wish to use this tool on a distribution that is not fully supported for automatic installed version detection, please:
+
+1.  **Open a new issue** detailing your operating system and the problem you are facing.
+2.  If you have knowledge of how to retrieve the installed Brave Browser version on your distribution (e.g., specific commands or file paths), please include this information in the issue.
+3.  Pull requests with added support for other distributions are highly appreciated! Please follow the existing code structure and provide clear explanations of your changes.
+
+Your feedback and contributions are valuable in making this tool more versatile.
