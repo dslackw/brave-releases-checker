@@ -295,7 +295,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         print("=" * 50)
 
         if latest_version > installed_version:
-            print(f"\n{self.color.bgreen}A newer version is available: v{latest_version}{self.color.endc}")
+            print(f"\n{self.color.byellow}A newer version is available: v{latest_version}{self.color.endc}")
             try:
                 answer = input(f'\nDo you want to download it? [{self.color.bgreen}y{self.color.endc}/{self.color.bold}N{self.color.endc}] ')
             except (KeyboardInterrupt, EOFError):

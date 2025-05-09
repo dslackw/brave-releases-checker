@@ -16,6 +16,8 @@ class Colors:
     red: str = '\x1b[91m'
     bgreen: str = f'{bold}{green}'
     bred: str = f'{bold}{red}'
+    yellow = '\x1b[93m'
+    byellow = f'{bold}{yellow}'
     endc: str = '\x1b[0m'
 
 
