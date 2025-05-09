@@ -164,20 +164,15 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
 
     def _get_installed_version_arch(self) -> Union[version.Version, None]:
         """Gets installed version on Arch Linux."""
-        try:
-            process = subprocess.run(['pacman', '-Qi', self.package_name_prefix], capture_output=True, text=True, check=True)
+        process = subprocess.run(['pacman', '-Qi', self.package_name_prefix], capture_output=True, text=True, check=True)
+        if process.returncode == 0:
             output = process.stdout
             for line in output.splitlines():
-                if line.startswith('Version        :'):
+                if line.startswith('Version'):
                     version_str = line.split(':')[-1].strip()
                     print(f"Installed Package (Arch): {self.package_name_prefix} - Version: {version_str}")
                     return version.parse(version_str)
-        except subprocess.CalledProcessError:
-            print(f"Package {self.package_name_prefix} is not installed on this Arch-based system.")
-            sys.exit(1)
-        except FileNotFoundError:
-            print(f"{self.color.bred}Error:{self.color.endc} pacman command not found.")
-            sys.exit(1)
+        print(f"Package {self.package_name_prefix} is not installed on this Arch-based system.")
         return None
 
     def _get_installed_version_opensuse(self) -> Union[version.Version, None]:

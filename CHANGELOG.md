@@ -7,11 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Fixed
-- Fixed rpm return exit code:** Corrected the method for extracting the installed Brave Browser version from rpm and packages on openSUSE with zypper command.
+- **Fixed rpm return exit code:** Corrected the method for extracting the installed Brave Browser version from rpm and packages on openSUSE with zypper command.
+- **Fixed find brave-browser:**  Corrected the method for extracting the installed Brave Browser version and package on archlinux and pacman package manager. 
 
 ## [0.1.6] - 2025-05-09
 ### Fixed
-- Fixed rpm return exit code:** Corrected the method for extracting the installed Brave Browser version from rpm packages on Fedora.
+- **Fixed rpm return exit code:** Corrected the method for extracting the installed Brave Browser version from rpm packages on Fedora.
 ### Added
 - **Added support:** Arch x86_64 for .rpm packages.
 ### Updated
