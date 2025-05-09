@@ -40,7 +40,7 @@ class Config:  # pylint: disable=[R0902]
     channel: str = 'stable'
     asset_suffix: str = '.deb'
     asset_arch: str = '.amd64'
-    page: str = '1'
+    pages: str = '1'
     config_path: Union[str, None] = None
 
 
@@ -85,6 +85,6 @@ def load_config() -> Config:
         channel=config_parser.get('DEFAULT', 'channel', fallback='stable'),
         asset_suffix=config_parser.get('DEFAULT', 'suffix', fallback='.deb'),
         asset_arch=config_parser.get('DEFAULT', 'arch', fallback='amd64'),
-        page=config_parser.get('DEFAULT', '1', fallback='1'),
+        pages=config_parser.get('DEFAULT', 'pages', fallback='1'),
         config_path=found_config_path
     )

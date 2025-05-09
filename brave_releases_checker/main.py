@@ -32,7 +32,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         self.channel = config.channel
         self.asset_suffix = config.asset_suffix
         self.asset_arch = config.asset_arch
-        self.page = int(config.page)
+        self.pages = int(config.pages)
         self.color = Colors()
 
         self.download_url = "https://github.com/brave/brave-browser/releases/download/"
@@ -53,12 +53,25 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         parser.add_argument('--arch', default=self.asset_arch, choices=['amd64', 'arm64', 'aarch64', 'x86_64'], help="Architecture to filter")
         parser.add_argument('--download-path', default=self.download_folder, help="Path to download")
         parser.add_argument('--asset-version', help="Specify the asset version")
-        parser.add_argument('--page', type=int, default=self.page, help="Page number of releases to fetch")
+        parser.add_argument('--pages', type=str, default=self.pages, help="Page number or range (e.g., 1 or 1-5) of releases to fetch")
         parser.add_argument('--list', action='store_true', help="List available releases based on criteria")
         parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
         args = parser.parse_args()
-        if args.page < 1:
-            print(f'{self.color.bred}Error{self.color.endc}: Page number must be a positive integer.')
+
+        try:
+            if '-' in args.pages:
+                start_page_str, end_page_str = args.pages.split('-')
+                args.start_page = int(start_page_str)
+                args.end_page = int(end_page_str)
+                if args.start_page < 1 or args.end_page < args.start_page:
+                    raise ValueError("Invalid page range.")
+            else:
+                args.start_page = int(args.pages)
+                args.end_page = int(args.pages)
+                if args.start_page < 1:
+                    raise ValueError("Page number must be a positive integer.")
+        except ValueError as e:
+            print(f'{self.color.bred}Error:{self.color.endc} Invalid page specification: {e}')
             sys.exit(1)
         return args
 
@@ -193,49 +206,51 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
 
     def _fetch_github_releases(self) -> list:
         """Fetches Brave Browser releases from GitHub API based on criteria."""
-        api_url = f"https://api.github.com/repos/{self.repo}/releases?page={self.args.page}"
-        sys.stdout.write(f"{self.color.bold}Connecting to GitHub... {self.color.endc}")
-        sys.stdout.flush()
-        try:
-            response = requests.get(api_url, headers=self.headers, timeout=10)
-            response.raise_for_status()  # Raise an exception for bad status codes (4xx or 5xx)
-        except requests.exceptions.Timeout:
-            print(f"{self.color.bred}Error:{self.color.endc} Connection to GitHub timed out.")
-            sys.exit(1)
-        except requests.exceptions.RequestException as e:
-            print(f"{self.color.bred}Error:{self.color.endc} Failed to download releases from GitHub: {e}")
-            sys.exit(1)
-
-        releases = response.json()
-        assets = []
+        all_assets = []
         build_release_lower = self.args.channel.lower()
         brave_asset_suffix = self.args.suffix
         arch = self.args.arch
 
-        for rel in releases:
-            release_version = rel['tag_name'].lstrip('v')
-            for asset in rel['assets']:
-                asset_name = asset['name']
-                if asset_name.endswith(brave_asset_suffix) and arch in asset_name:
-                    asset_lower = asset_name.lower()
-                    add_asset = False
-                    if build_release_lower == 'stable':
-                        if 'nightly' not in asset_lower and 'beta' not in asset_lower:
-                            add_asset = True
-                    elif build_release_lower == 'beta':
-                        if 'beta' in asset_lower:
-                            add_asset = True
-                    elif build_release_lower == 'nightly':
-                        if 'nightly' in asset_lower:
-                            add_asset = True
+        for page in range(self.args.start_page, self.args.end_page + 1):
+            api_url = f"https://api.github.com/repos/{self.repo}/releases?page={page}"
+            sys.stdout.write(f"{self.color.bold}Connecting to GitHub (Page {page})... {self.color.endc}")
+            sys.stdout.flush()
+            try:
+                response = requests.get(api_url, headers=self.headers, timeout=10)
+                response.raise_for_status()  # Raise an exception for bad status codes (4xx or 5xx)
+                releases = response.json()
+                for rel in releases:
+                    release_version = rel['tag_name'].lstrip('v')
+                    for asset in rel['assets']:
+                        asset_name = asset['name']
+                        if asset_name.endswith(brave_asset_suffix) and arch in asset_name:
+                            asset_lower = asset_name.lower()
+                            add_asset = False
+                            if build_release_lower == 'stable':
+                                if 'nightly' not in asset_lower and 'beta' not in asset_lower:
+                                    add_asset = True
+                            elif build_release_lower == 'beta':
+                                if 'beta' in asset_lower:
+                                    add_asset = True
+                            elif build_release_lower == 'nightly':
+                                if 'nightly' in asset_lower:
+                                    add_asset = True
 
-                    if add_asset:
-                        assets.append({
-                            'version': release_version,
-                            'asset_name': asset_name,
-                            'tag_name': rel['tag_name']
-                        })
-        return assets
+                            if add_asset:
+                                all_assets.append({
+                                    'version': release_version,
+                                    'asset_name': asset_name,
+                                    'tag_name': rel['tag_name']
+                                })
+            except requests.exceptions.Timeout:
+                print(f"{self.color.bred}Error:{self.color.endc} Connection to GitHub (Page {page}) timed out.")
+                sys.exit(1)
+            except requests.exceptions.RequestException as e:
+                print(f"{self.color.bred}Error:{self.color.endc} Failed to download releases from GitHub (Page {page}): {e}")
+                sys.exit(1)
+            print("Done.")
+
+        return all_assets
 
     def _list_assets_found(self, all_found_assets: list) -> None:
         """List all available releases based on criteria."""
@@ -244,7 +259,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         print(f"{self.color.bold}Channel:{self.color.endc} {self.args.channel.capitalize()}")
         print(f"{self.color.bold}Architecture:{self.color.endc} {self.args.arch}")
         print(f"{self.color.bold}File Suffix:{self.color.endc} {self.args.suffix}")
-        print(f"{self.color.bold}Page:{self.color.endc} {self.args.page}")
+        print(f"{self.color.bold}Page:{self.color.endc} {self.args.pages}")
         print("-" * 50)
         if all_found_assets:
             print(f"{self.color.bold}{'Version':<15} {'Filename'}{self.color.endc}")
@@ -272,7 +287,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         print(f"{self.color.bold}Channel:{self.color.endc} {self.args.channel.capitalize()}")
         print(f"{self.color.bold}Architecture:{self.color.endc} {self.args.arch}")
         print(f"{self.color.bold}File Suffix:{self.color.endc} {self.args.suffix}")
-        print(f"{self.color.bold}Checking Page:{self.color.endc} {self.args.page}")
+        print(f"{self.color.bold}Checking Page:{self.color.endc} {self.args.pages}")
         print("-" * 50)
         print(f"{self.color.bold}Installed Version:{self.color.endc} v{installed_version}")
         print("=" * 50)
@@ -294,7 +309,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             latest_asset = all_found_assets[0]
         else:
             print(f"\n{self.color.bold}No {self.args.channel.capitalize()} {self.args.suffix} files for"
-                  f" {self.args.arch} were found on page {self.args.page}.{self.color.endc}\n")
+                  f" {self.args.arch} were found on page {self.args.pages}.{self.color.endc}\n")
             print("=" * 50 + "\n")
             return
 

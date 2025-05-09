@@ -9,8 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - **Fixed for config path:** Corrected to check config.ini file if exists instead the path of the config.ini.
 ### Added
-- **Added default configs:** Improved the configurations passed the default values into the config.ini file.
-- **Added list option:** New option --list to list all available releases based on criteria.
+- **Default Configurations from `config.ini`:** Implemented support for automatically loading default values for command-line arguments from the `config.ini` configuration file.
+- **List Available Releases Option (`--list`):** Added a new command-line parameter `--list` that allows users to display a detailed list of available releases, filtered according to other specified parameters (channel, architecture, file suffix).
+- **Page Range Support (`--pages`):** Integrated the ability to specify a range of pages on the GitHub API to search for releases, using the `--pages` parameter (e.g., `--pages 1-5`).
 
 ## [0.1.7] - 2025-05-09
 ### Fixed
