@@ -54,6 +54,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         parser.add_argument('--download-path', default=self.download_folder, help="Path to download")
         parser.add_argument('--asset-version', help="Specify the asset version")
         parser.add_argument('--page', type=int, default=self.page, help="Page number of releases to fetch")
+        parser.add_argument('--list', action='store_true', help="List available releases based on criteria")
         parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
         args = parser.parse_args()
         if args.page < 1:
@@ -236,6 +237,25 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
                         })
         return assets
 
+    def _list_assets_found(self, all_found_assets: list) -> None:
+        """List all available releases based on criteria."""
+        print("\n" + "=" * 50)
+        print(f"{self.color.bold}Available Brave Releases{self.color.endc}")
+        print(f"{self.color.bold}Channel:{self.color.endc} {self.args.channel.capitalize()}")
+        print(f"{self.color.bold}Architecture:{self.color.endc} {self.args.arch}")
+        print(f"{self.color.bold}File Suffix:{self.color.endc} {self.args.suffix}")
+        print(f"{self.color.bold}Page:{self.color.endc} {self.args.page}")
+        print("-" * 50)
+        if all_found_assets:
+            print(f"{self.color.bold}{'Version':<15} {'Filename'}{self.color.endc}")
+            print("-" * 50)
+            for asset in all_found_assets:
+                print(f"{asset['version']:<15} {asset['asset_name']}")
+        else:
+            print(f"{self.color.byellow}No releases found matching your criteria on this page.{self.color.endc}")
+        print("=" * 50 + "\n")
+        sys.exit(0)
+
     def _check_and_download(self, installed_version: version.Version, all_found_assets: list) -> None:  # pylint: disable=[R0912,R0915]
         """Checks for newer versions and offers to download."""
         asset_version_arg = self.args.asset_version
@@ -243,6 +263,9 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
 
         if download_folder:
             self.download_folder = download_folder
+
+        if self.args.list:
+            self._list_assets_found(all_found_assets)
 
         print("\n" + "=" * 50)
         print(f"{self.color.bold}Brave Releases Checker{self.color.endc}")

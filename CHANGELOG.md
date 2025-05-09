@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Fixed for config path:** Corrected to check config.ini file if exists instead the path of the config.ini.
 ### Added
 - **Added default configs:** Improved the configurations passed the default values into the config.ini file.
+- **Added list option:** New option --list to list all available releases based on criteria.
 
 ## [0.1.7] - 2025-05-09
 ### Fixed
