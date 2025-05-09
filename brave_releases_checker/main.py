@@ -69,9 +69,9 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             'slackware': self._get_installed_version_slackware,
             'ubuntu': self._get_installed_version_debian,
             'debian': self._get_installed_version_debian,
-            'fedora': self._get_installed_version_rpm,
-            'centos': self._get_installed_version_rpm,
-            'redhat': self._get_installed_version_rpm,
+            'fedora': self._get_installed_version_dnf,
+            'centos': self._get_installed_version_dnf,
+            'redhat': self._get_installed_version_dnf,
             'arch': self._get_installed_version_arch,
             'opensuse': self._get_installed_version_opensuse,
         }
@@ -150,7 +150,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             return None
         return None
 
-    def _get_installed_version_rpm(self) -> Union[version.Version, None]:
+    def _get_installed_version_dnf(self) -> Union[version.Version, None]:
         """Gets installed version on RPM-based systems."""
         process = subprocess.run(['dnf', 'list', self.package_name_prefix], capture_output=True, text=True, check=False)
         if process.returncode == 0:
