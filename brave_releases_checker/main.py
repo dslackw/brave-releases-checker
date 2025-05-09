@@ -206,10 +206,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
 
     def _fetch_github_releases(self) -> list:
         """Fetches Brave Browser releases from GitHub API based on criteria."""
-        all_assets = []
-        build_release_lower = self.args.channel.lower()
-        brave_asset_suffix = self.args.suffix
-        arch = self.args.arch
+        all_assets: list = []
 
         for page in range(self.args.start_page, self.args.end_page + 1):
             api_url = f"https://api.github.com/repos/{self.repo}/releases?page={page}"
@@ -219,29 +216,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
                 response = requests.get(api_url, headers=self.headers, timeout=10)
                 response.raise_for_status()  # Raise an exception for bad status codes (4xx or 5xx)
                 releases = response.json()
-                for rel in releases:
-                    release_version = rel['tag_name'].lstrip('v')
-                    for asset in rel['assets']:
-                        asset_name = asset['name']
-                        if asset_name.endswith(brave_asset_suffix) and arch in asset_name:
-                            asset_lower = asset_name.lower()
-                            add_asset = False
-                            if build_release_lower == 'stable':
-                                if 'nightly' not in asset_lower and 'beta' not in asset_lower:
-                                    add_asset = True
-                            elif build_release_lower == 'beta':
-                                if 'beta' in asset_lower:
-                                    add_asset = True
-                            elif build_release_lower == 'nightly':
-                                if 'nightly' in asset_lower:
-                                    add_asset = True
-
-                            if add_asset:
-                                all_assets.append({
-                                    'version': release_version,
-                                    'asset_name': asset_name,
-                                    'tag_name': rel['tag_name']
-                                })
+                self._process_releases_for_page(releases, all_assets)
             except requests.exceptions.Timeout:
                 print(f"{self.color.bred}Error:{self.color.endc} Connection to GitHub (Page {page}) timed out.")
                 sys.exit(1)
@@ -251,6 +226,36 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             print("Done.")
 
         return all_assets
+
+    def _process_releases_for_page(self, releases: list, all_assets: list) -> None:
+        """Processes the releases fetched from a single GitHub API page."""
+        build_release_lower = self.args.channel.lower()
+        brave_asset_suffix = self.args.suffix
+        arch = self.args.arch
+
+        for rel in releases:
+            release_version = rel['tag_name'].lstrip('v')
+            for asset in rel['assets']:
+                asset_name = asset['name']
+                if asset_name.endswith(brave_asset_suffix) and arch in asset_name:
+                    asset_lower = asset_name.lower()
+                    add_asset = False
+                    if build_release_lower == 'stable':
+                        if 'nightly' not in asset_lower and 'beta' not in asset_lower:
+                            add_asset = True
+                    elif build_release_lower == 'beta':
+                        if 'beta' in asset_lower:
+                            add_asset = True
+                    elif build_release_lower == 'nightly':
+                        if 'nightly' in asset_lower:
+                            add_asset = True
+
+                    if add_asset:
+                        all_assets.append({
+                            'version': release_version,
+                            'asset_name': asset_name,
+                            'tag_name': rel['tag_name']
+                        })
 
     def _list_assets_found(self, all_found_assets: list) -> None:
         """List all available releases based on criteria."""
