@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.5] - 2025-05-08
 ### Fixed
 - Fixed Snap package version detection:** Corrected the method for extracting the installed Brave Browser version from Snap packages on Ubuntu, ensuring accurate version retrieval when Brave is installed via Snap.
+### Added
+- **Added support:** Arch x86_64 for .rpm packages.
 
 ## [0.1.4] - 2025-05-08
 ### Added

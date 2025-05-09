@@ -49,7 +49,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         parser.add_argument('--channel', default='stable', choices=['stable', 'beta', 'nightly'], help="Release channel to check")
         parser.add_argument('--suffix', default='.deb', choices=['.deb', '.rpm', '.tar.gz', '.apk', '.zip', '.dmg', '.pkg'],
                             help="Asset file suffix to filter")
-        parser.add_argument('--arch', default='amd64', choices=['amd64', 'arm64', 'aarch64', 'universal'], help="Architecture to filter")
+        parser.add_argument('--arch', default='amd64', choices=['amd64', 'arm64', 'aarch64', 'x86_64'], help="Architecture to filter")
         parser.add_argument('--download-path', default=self.download_folder, help="Path to download")
         parser.add_argument('--asset-version', help="Specify the asset version")
         parser.add_argument('--page', type=int, default=1, help="Page number of releases to fetch")
