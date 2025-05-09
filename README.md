@@ -103,8 +103,8 @@ Here's an example `config.ini` file:
 channel = beta
 suffix = .rpm
 arch = arm64
-download_path = /tmp/brave_downloads
 pages = 1
+download_path = /tmp/brave_downloads
 ```
 
 You can define default values for channel, suffix, arch, download_path, and the default pages to check. Command-line arguments will always override the settings in the config.ini file.
