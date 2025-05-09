@@ -233,7 +233,6 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
                             'asset_name': asset_name,
                             'tag_name': rel['tag_name']
                         })
-        print(assets)
         return assets
 
     def _check_and_download(self, installed_version: version.Version, all_found_assets: list) -> None:  # pylint: disable=[R0912,R0915]
