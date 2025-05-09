@@ -160,7 +160,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
                     version_str = line.split()[1].split('-')[0]
                     print(f"Installed Package (RPM): {self.package_name_prefix} - Version: {version_str}")
                     return version.parse(version_str)
-        print(f"{self.color.red}Warning:{self.color.endc} Package {self.package_name_prefix} not found or version info missing via rpm.")
+        print(f"{self.color.red}Warning:{self.color.endc} Package {self.package_name_prefix} not found or version info missing via dnf.")
         return None
 
     def _get_installed_version_arch(self) -> Union[version.Version, None]:
