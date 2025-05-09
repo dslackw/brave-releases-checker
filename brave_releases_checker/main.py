@@ -223,7 +223,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             except requests.exceptions.RequestException as e:
                 print(f"{self.color.bred}Error:{self.color.endc} Failed to download releases from GitHub (Page {page}): {e}")
                 sys.exit(1)
-            print("Done.")
+            print("Done")
 
         return all_assets
 
