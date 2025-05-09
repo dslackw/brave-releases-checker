@@ -5,7 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.1.7] - 2025-05-09
+## [Unreleased]
+### Fixed
+- **Fixed for config path:** Corrected to check config.ini file if exists instead the path of the config.ini.
+
+## [0.1.7] - 2025-05-09
 ### Fixed
 - **Fixed rpm return exit code:** Corrected the method for extracting the installed Brave Browser version from rpm and packages on openSUSE with zypper command.
 - **Fixed find brave-browser:**  Corrected the method for extracting the installed Brave Browser version and package on archlinux and pacman package manager. 

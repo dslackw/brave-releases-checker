@@ -62,7 +62,7 @@ def load_config() -> Config:
     found_config_path = None
     config_found = False
     for path in config_paths:
-        if os.path.exists(path):
+        if os.path.isfile(path):
             found_config_path = path
             config_parser.read(path)
             config_found = True
