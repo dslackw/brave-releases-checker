@@ -11,6 +11,7 @@ import requests
 from packaging import version
 
 from brave_releases_checker.config import Colors, load_config
+from brave_releases_checker.distributions import InstalledVersion
 from brave_releases_checker.version import __version__
 
 
@@ -26,14 +27,13 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         setting headers for GitHub API requests, and parsing command-line arguments.
         """
         config = load_config()
-        self.package_name_prefix = config.package_name_prefix
         self.download_folder = str(config.download_folder)
-        self.log_packages = config.package_path
         self.channel = config.channel
         self.asset_suffix = config.asset_suffix
         self.asset_arch = config.asset_arch
         self.pages = config.pages
         self.color = Colors()
+        self.installed_version = InstalledVersion()
 
         self.download_url = 'https://github.com/brave/brave-browser/releases/download/'
         self.repo = 'brave/brave-browser'
@@ -81,15 +81,15 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         version_info = None
 
         distribution_handlers = {
-            'slackware': self._get_installed_version_slackware,
-            'ubuntu': self._get_installed_version_debian,
-            'debian': self._get_installed_version_debian,
-            'fedora': self._get_installed_version_dnf,
-            'centos': self._get_installed_version_dnf,
-            'redhat': self._get_installed_version_dnf,
-            'arch': self._get_installed_version_arch,
-            'opensuse-tumbleweed': self._get_installed_version_opensuse,
-            'opensuse-leap': self._get_installed_version_opensuse,
+            'slackware': self.installed_version.get_slackware,
+            'ubuntu': self.installed_version.get_debian_dpkg,
+            'debian': self.installed_version.get_debian_dpkg,
+            'fedora': self.installed_version.get_rpm_dnf,
+            'centos': self.installed_version.get_rpm_dnf,
+            'redhat': self.installed_version.get_rpm_dnf,
+            'arch': self.installed_version.get_arch,
+            'opensuse-tumbleweed': self.installed_version.get_opensuse,
+            'opensuse-leap': self.installed_version.get_opensuse,
         }
 
         handler = distribution_handlers.get(distribution)
@@ -99,110 +99,6 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             print(f'Unsupported distribution: {distribution}. Cannot determine installed version.')
 
         return version_info
-
-    def _get_installed_version_slackware(self) -> Union[version.Version, None]:
-        """Gets installed version on Slackware."""
-        brave_package = list(self.log_packages.glob(f'{self.package_name_prefix}*'))
-        if brave_package:
-            installed_info = str(brave_package[0]).rsplit('/', maxsplit=1)[-1]
-            version_str = installed_info.split('-')[2]
-            print(f'Installed Package (Slackware): {installed_info}')
-            return version.parse(version_str)
-        return None
-
-    def _get_installed_version_debian(self) -> Union[version.Version, None]:
-        """Gets installed version on Debian-based systems, with fallback to snap on Ubuntu."""
-        try:
-            process = subprocess.run(['dpkg', '-s', self.package_name_prefix], capture_output=True, text=True, check=True)
-            output = process.stdout
-            for line in output.splitlines():
-                if line.startswith('Version:'):
-                    version_str = line.split(':')[-1].strip()
-                    print(f'Installed Package (Debian): {self.package_name_prefix} - Version: {version_str}')
-                    return version.parse(version_str)
-            # If we reach here, dpkg didn't find the package or the Version line
-            print(f'Package {self.package_name_prefix} not found or version info missing via dpkg.')
-        except subprocess.CalledProcessError:
-            print(f'Package {self.package_name_prefix} is not installed on this Debian-based system (via dpkg).')
-        except FileNotFoundError:
-            print(f'{self.color.bred}Error:{self.color.endc} dpkg command not found.')
-            return None  # dpkg not available, cannot proceed with debian check
-
-        # Fallback to snap if on Ubuntu
-        if distro.id().lower() == 'ubuntu':
-            try:
-                subprocess.run(['which', 'snap'], check=True, capture_output=True)
-                print('Attempting to get version via snap...')
-                return self._get_installed_version_snap()
-            except (subprocess.CalledProcessError, FileNotFoundError):
-                print('snap command not found or not available.')
-                return None
-
-        return None
-
-    def _get_installed_version_snap(self) -> Union[version.Version, None]:
-        """Gets installed version on systems with snapd where Brave is installed as a snap."""
-        try:
-            process = subprocess.run(['snap', 'info', 'brave'], capture_output=True, text=True, check=True)
-            output = process.stdout
-            version_str = None
-            for line in output.splitlines():
-                if line.startswith('installed:'):
-                    version_str = line.split()[1]
-                    print(f'Installed Package (Snap): brave - Version: {version_str}')
-                    return version.parse(version_str)
-            if not version_str:
-                print('Could not find installed version information in snap info output.')
-                return None
-        except subprocess.CalledProcessError as e:
-            if "error: unknown snap \'brave\'" in e.stderr:
-                print('Brave Browser is not installed as a snap.')
-                return None
-            print(f'{self.color.bred}Error:{self.color.endc} checking snap package: {e}')
-            return None
-        except FileNotFoundError:
-            print(f'{self.color.bred}Error:{self.color.endc} snap command not found.')
-            return None
-        return None
-
-    def _get_installed_version_dnf(self) -> Union[version.Version, None]:
-        """Gets installed version on RPM-based systems."""
-        process = subprocess.run(['dnf', 'list', self.package_name_prefix], capture_output=True, text=True, check=False)
-        if process.returncode == 0:
-            output = process.stdout
-            for line in output.splitlines():
-                if line.startswith(self.package_name_prefix):
-                    version_str = line.split()[1].split('-')[0]
-                    print(f'Installed Package (RPM): {self.package_name_prefix} - Version: {version_str}')
-                    return version.parse(version_str)
-        print(f'Package {self.package_name_prefix} not found or version info missing.')
-        return None
-
-    def _get_installed_version_arch(self) -> Union[version.Version, None]:
-        """Gets installed version on Arch Linux."""
-        process = subprocess.run(['pacman', '-Qi', self.package_name_prefix], capture_output=True, text=True, check=True)
-        if process.returncode == 0:
-            output = process.stdout
-            for line in output.splitlines():
-                if line.startswith('Version'):
-                    version_str = line.split(':')[-1].strip()
-                    print(f'Installed Package (Arch): {self.package_name_prefix} - Version: {version_str}')
-                    return version.parse(version_str)
-        print(f'Package {self.package_name_prefix} not found or version info missing.')
-        return None
-
-    def _get_installed_version_opensuse(self) -> Union[version.Version, None]:
-        """Gets installed version on openSUSE."""
-        process = subprocess.run(['zypper', 'info', self.package_name_prefix], capture_output=True, text=True, check=True)
-        if process.returncode == 0:
-            output = process.stdout
-            for line in output.splitlines():
-                if line.startswith('Version'):
-                    version_str = line.split(':')[1].split('-')[0].strip()
-                    print(f'Installed Package (openSUSE): {self.package_name_prefix} - Version: {version_str}')
-                    return version.parse(version_str)
-        print(f'Package {self.package_name_prefix} not found or version info missing.')
-        return None
 
     def _fetch_github_releases(self) -> list:
         """Fetches Brave Browser releases from GitHub API based on criteria."""
