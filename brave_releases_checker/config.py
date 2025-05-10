@@ -5,7 +5,7 @@ import configparser
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Union
+from types import SimpleNamespace
 
 
 @dataclass
@@ -21,30 +21,11 @@ class Colors:
     endc: str = '\x1b[0m'
 
 
-@dataclass
-class Config:  # pylint: disable=[R0902]
-    """
-    Represents the configuration settings for the Brave Release Checker.
-
-    Attributes:
-        package_path (Path): The default path to the directory containing installed package information.
-        package_name_prefix (str): The prefix of the Brave Browser package name.
-        github_token (str): The GitHub API token for authenticated requests (optional).
-        download_folder (Path): The default path to download new releases.
-        config_path (Union[str, None]): The path to the loaded configuration file, if found.
-    """
-    package_path: Path = Path('/var/log/packages/')
-    package_name_prefix: str = 'brave-browser'
-    github_token: str = ''
-    download_folder: Path = Path(os.path.expanduser('~/Downloads/'))
-    channel: str = 'stable'
-    asset_suffix: str = '.deb'
-    asset_arch: str = 'amd64'
-    pages: str = '1'
-    config_path: Union[str, None] = None
+# We use a SimpleNamespace to store the configuration instance.
+_CONFIG_INSTANCE = None
 
 
-def load_config() -> Config:
+def load_config() -> SimpleNamespace:
     """
     Loads configuration settings from a config.ini file, if found.
 
@@ -55,8 +36,13 @@ def load_config() -> Config:
     If no config file is found, default settings are used.
 
     Returns:
-        Config: An instance of the Config dataclass containing the loaded or default settings.
+        SimpleNamespace: An instance containing the loaded or default settings.
     """
+    # We need global to modify the global variable
+    global _CONFIG_INSTANCE  # pylint: disable=W0603
+    if _CONFIG_INSTANCE:
+        return _CONFIG_INSTANCE
+
     color = Colors()
     config_parser = configparser.ConfigParser()
     config_paths = [
@@ -74,17 +60,27 @@ def load_config() -> Config:
 
     if not config_found:
         print(f'{color.bred}Warning:{color.endc} The config file not found. Default settings will be used.')
-        return Config(config_path=found_config_path)
-
-    download_path_from_config = config_parser.get('DEFAULT', 'download_path', fallback=None)
-    return Config(
-        package_path=Path(config_parser.get('PACKAGE', 'path', fallback='/var/log/packages/')),
-        package_name_prefix=config_parser.get('PACKAGE', 'package_name', fallback='brave-browser'),
-        github_token=config_parser.get('GITHUB', 'token', fallback=''),
-        download_folder=Path(download_path_from_config) if download_path_from_config else Path(os.path.expanduser('~/Downloads/')),
-        channel=config_parser.get('DEFAULT', 'channel', fallback='stable'),
-        asset_suffix=config_parser.get('DEFAULT', 'suffix', fallback='.deb'),
-        asset_arch=config_parser.get('DEFAULT', 'arch', fallback='amd64'),
-        pages=config_parser.get('DEFAULT', 'pages', fallback='1'),
-        config_path=found_config_path
-    )
+        _CONFIG_INSTANCE = SimpleNamespace(
+            package_path=str(Path('/var/log/packages/')),
+            package_name_prefix='brave-browser',
+            github_token='',
+            download_folder=str(Path(os.path.expanduser('~/Downloads/'))),
+            channel='stable',
+            asset_suffix='.deb',
+            asset_arch='amd64',
+            pages='1',
+            config_path=found_config_path
+        )
+    else:
+        _CONFIG_INSTANCE = SimpleNamespace(
+            package_path=config_parser.get('PACKAGE', 'path', fallback='/var/log/packages/'),
+            package_name_prefix=config_parser.get('PACKAGE', 'package_name', fallback='brave-browser'),
+            github_token=config_parser.get('GITHUB', 'token', fallback=''),
+            download_folder=config_parser.get('DEFAULT', 'download_path', fallback=str(Path(os.path.expanduser('~/Downloads/')))),
+            channel=config_parser.get('DEFAULT', 'channel', fallback='stable'),
+            asset_suffix=config_parser.get('DEFAULT', 'suffix', fallback='.deb'),
+            asset_arch=config_parser.get('DEFAULT', 'arch', fallback='amd64'),
+            pages=config_parser.get('DEFAULT', 'pages', fallback='1'),
+            config_path=found_config_path
+        )
+    return _CONFIG_INSTANCE

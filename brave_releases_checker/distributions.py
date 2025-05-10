@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import subprocess
+from pathlib import Path
 from typing import Union
 
 import distro
@@ -26,7 +27,7 @@ class InstalledVersion:
 
     def __init__(self):
         config = load_config()
-        self.log_packages = config.package_path
+        self.log_packages = Path(config.package_path)
         self.package_name_prefix = config.package_name_prefix
         self.color = Colors()
 
