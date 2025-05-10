@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - **Dedicated Distribution Module:** Introduced a separate `distributions.py` module to handle the logic for detecting the installed Brave Browser version on different operating systems. This improves code organization and maintainability.
+### Fixed
+- **Fixed default arch:** Correct default architecture value if the config.ini file not set.
 
 ## [0.1.8] - 2025-05-10
 ### Fixed
