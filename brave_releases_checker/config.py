@@ -39,7 +39,7 @@ class Config:  # pylint: disable=[R0902]
     download_folder: Path = Path(os.path.expanduser('~/Downloads/'))
     channel: str = 'stable'
     asset_suffix: str = '.deb'
-    asset_arch: str = '.amd64'
+    asset_arch: str = 'amd64'
     pages: str = '1'
     config_path: Union[str, None] = None
 

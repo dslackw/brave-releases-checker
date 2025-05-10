@@ -113,7 +113,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
                 response = requests.get(f"https://api.github.com/repos/{self.repo}/releases?page={page}", headers=self.headers, timeout=10)
                 response.raise_for_status()
                 releases = response.json()
-                self._process_releases_for_page(releases, all_assets)
+                all_assets = self._process_releases_for_page(releases)
             except requests.exceptions.Timeout:
                 sys.stdout.write(f"\r{self.color.bred}Error:{self.color.endc} Connection to GitHub (Page {page}) timed out.{" " * 40}\n")
                 sys.stdout.flush()
@@ -128,8 +128,9 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         sys.stdout.flush()
         return all_assets
 
-    def _process_releases_for_page(self, releases: list, all_assets: list) -> None:
+    def _process_releases_for_page(self, releases: list) -> list:
         """Processes the releases fetched from a single GitHub API page."""
+        all_assets: list = []
         build_release_lower = self.args.channel.lower()
         brave_asset_suffix = self.args.suffix
         arch = self.args.arch
@@ -157,6 +158,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
                             'asset_name': asset_name,
                             'tag_name': rel['tag_name']
                         })
+        return all_assets
 
     def _list_assets_found(self, all_found_assets: list) -> None:
         """List all available releases based on criteria."""
