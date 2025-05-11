@@ -25,7 +25,7 @@ class InstalledVersion:
         color (Colors): An instance of the Colors class for colored output.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         config = load_config()
         self.log_packages = Path(config.package_path)
         self.package_name_prefix = config.package_name_prefix
