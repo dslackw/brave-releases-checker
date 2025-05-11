@@ -50,15 +50,13 @@ def load_config() -> SimpleNamespace:
         os.path.expanduser('~/.config/brave-releases-checker/config.ini')
     ]
     found_config_path = None
-    config_found = False
     for path in config_paths:
         if os.path.isfile(path):
             found_config_path = path
             config_parser.read(path)
-            config_found = True
             break
 
-    if not config_found:
+    if not found_config_path:
         print(f'{color.bred}Warning:{color.endc} The config file not found. Default settings will be used.')
         _CONFIG_INSTANCE = SimpleNamespace(
             package_path=str(Path('/var/log/packages/')),
