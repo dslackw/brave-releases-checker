@@ -4,7 +4,7 @@
 import argparse
 import subprocess
 import sys
-from typing import Union
+from typing import Any, Union
 
 import distro
 import requests
@@ -100,9 +100,9 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
 
         return version_info
 
-    def _fetch_github_releases(self) -> list:
+    def _fetch_github_releases(self) -> list[str]:
         """Fetches Brave Browser releases from GitHub API based on criteria."""
-        all_assets: list = []
+        all_assets: list[str] = []
         total_pages = self.args.end_page - self.args.start_page + 1
 
         for _, page in enumerate(range(self.args.start_page, self.args.end_page + 1)):
@@ -128,7 +128,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         sys.stdout.flush()
         return all_assets
 
-    def _process_releases_for_page(self, releases: list, all_assets: list) -> None:
+    def _process_releases_for_page(self, releases: list[Any], all_assets: list[Any]) -> None:
         """Processes the releases fetched from a single GitHub API page."""
         build_release_lower = self.args.channel.lower()
         brave_asset_suffix = self.args.suffix
@@ -158,7 +158,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
                             'tag_name': rel['tag_name']
                         })
 
-    def _list_assets_found(self, all_found_assets: list) -> None:
+    def _list_assets_found(self, all_found_assets: list[Any]) -> None:
         """List all available releases based on criteria."""
         print('\n' + '=' * 50)
         print(f'{self.color.bold}Available Brave Releases{self.color.endc}')
@@ -177,7 +177,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         print('=' * 50 + '\n')
         sys.exit(0)
 
-    def _check_and_download(self, installed_version: version.Version, all_found_assets: list) -> None:  # pylint: disable=[R0912,R0915]
+    def _check_and_download(self, installed_version: version.Version, all_found_assets: list[Any]) -> None:  # pylint: disable=[R0912,R0915]
         """Checks for newer versions and offers to download."""
         asset_version_arg = self.args.asset_version
         download_folder = self.args.download_path
