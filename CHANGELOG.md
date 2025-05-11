@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## [Unreleased]
+### Fixed
+- **Subprocess execution error:** Resolved an issue that caused an error during the execution of the zypper output command check on openSUSE systems. This problem occurred when interacting with the zypper package management system and has now been fixed.
+
 ## [0.2.0] - 2025-05-11
 ### Fixed
 - **Double load config:** Prevented the configuration from being loaded twice during startup.

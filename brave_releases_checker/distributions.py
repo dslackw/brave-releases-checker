@@ -124,7 +124,7 @@ class InstalledVersion:
 
     def get_opensuse(self) -> Union[version.Version, None]:
         """Gets installed version on openSUSE."""
-        process = subprocess.run(['zypper', 'info', self.package_name_prefix], capture_output=True, text=True, check=True)
+        process = subprocess.run(['zypper', 'info', self.package_name_prefix], capture_output=True, text=True, check=False)
         if process.returncode == 0:
             output = process.stdout
             for line in output.splitlines():
