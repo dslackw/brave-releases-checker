@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2025-05-11
+### Fixed
+- **README.md file:** Corrected an issue in the README.md file that affected the display or interpretation of bash commands. This ensures that bash commands are now viewed as intended.
+### Updated
+- **Development status:** The project's development status has been updated to Beta. This indicates that the software is now in a beta testing phase, meaning it has most features implemented but may still contain bugs and undergo further refinement before a stable release.
 
 ## [0.2.1] - 2025-05-11
 ### Fixed

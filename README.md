@@ -15,13 +15,17 @@ A simple command-line tool to check for the latest Brave Browser releases from G
 
 ## Installation
 
+```bash
 pip install brave-releases-checker
+```
 
 ## Usage
 
 Use the brc script from your command line with various options to tailor your release checks.
 
+```bash
 brc --help
+```
 
 ### Basic Checks
 
