@@ -4,14 +4,16 @@ A simple command-line tool to check for the latest Brave Browser releases from G
 
 ## Features
 
-* Latest Release Checking: Fetches the most recent Brave Browser releases from the official GitHub repository.
-* Release Channel Selection: Filter releases by channel: stable, beta, or nightly.
-* Architecture Filtering: Display assets for a specific architecture (e.g., amd64, arm64, aarch64, x86_64).
-* File Suffix Filtering: Specify the asset file type to filter (e.g., .deb, .rpm, .tar.gz, .apk, .zip, .dmg, .pkg).
-* List Available Releases: Option to list all matching releases on a specific page or a range of pages without checking for an installed version.
-* Page Range Search: Ability to search for releases across a specified range of pages on the GitHub API.
-* Flexible Configuration: Default settings can be configured and persisted in a config.ini file.
-* Console Script: Provides a convenient brc command-line script for easy use.
+* **Latest Release Checking:** Fetches the most recent Brave Browser releases from the official GitHub repository.
+* **Release Channel Selection:** Filter releases by channel: stable, beta, or nightly.
+* **Architecture Filtering:** Display assets for a specific architecture (e.g., amd64, arm64, aarch64, x86_64).
+* **File Suffix Filtering:** Specify the asset file type to filter (e.g., .deb, .rpm, .tar.gz, .apk, .zip, .dmg, .pkg).
+* **List Available Releases:** Option to list all matching releases on a specific page or a range of pages without checking for an installed version.
+* **Page Range Search:** Ability to search for releases across a specified range of pages on the GitHub API.
+* **Flexible Configuration:** Default settings can be configured and persisted in a config.ini file.
+* **Console Script:** Provides a convenient `brc` command-line script for easy use.
+* **Daemon Mode:** Run the checker in the background, periodically checking for new releases and notifying you of updates.
+* **Daemon Logging:** Comprehensive logging to a dedicated file for background operations.
 
 ## Installation
 
@@ -75,6 +77,7 @@ The `--page` option (when not using `--list`) specifies which page of releases t
     ```
 
 * List all nightly releases across pages 1 to 5:
+
     ```bash
     brc --list --channel nightly --pages 1-5
     ```
@@ -88,6 +91,36 @@ The `--page` option (when not using `--list`) specifies which page of releases t
     ```
 
 Combine this with other options to find a specific release for a channel and architecture.
+
+## Daemon Mode
+
+Run the Brave Releases Checker in the background as a daemon. It will periodically check for new releases and send desktop notifications when an update is available.
+
+* Run the checker in daemon mode, checking every 60 minutes (default):
+    
+    ```bash
+    brc --daemon
+    ```
+* Run the checker in daemon mode, checking every 30 minutes:
+
+    ```bash
+    brc --daemon --interval 30
+    ```
+
+## Daemon Logging
+
+When running in daemon mode, all operational messages, warnings, and errors are logged to a file. This is crucial for monitoring the daemon's activity without needing a console.
+
+Log File Location: The daemon logs are stored in:
+```~/.local/share/brave_checker/logs/brave_checker.log```
+(The directory will be created automatically if it doesn't exist.)
+
+* Accessing Logs: You can view the log file using standard command-line tools:
+
+    ```bash
+    tail -f ~/.local/share/brave_checker/logs/brave_checker.log
+    ```
+Or simply open it with a text editor.
 
 ## Configuration
 

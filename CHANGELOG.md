@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2025-06-17
+- **Added Daemon Mode:** Introducing a new `--daemon` option to run the Brave Releases Checker in the background. It periodically checks for updates and sends desktop notifications.
+- **Enhanced Logging for Daemon:** All daemon operations, warnings, and errors are now comprehensively logged to `~/.local/share/brave_checker/logs/brave_checker.log` for easier monitoring and debugging.
+
 ## [0.3.0] - 2025-05-11
 ### Fixed
 - **README.md file:** Corrected an issue in the README.md file that affected the display or interpretation of bash commands. This ensures that bash commands are now viewed as intended.

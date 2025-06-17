@@ -11,7 +11,7 @@ from types import SimpleNamespace
 @dataclass
 class Colors:
     """Represents ANSI escape codes for terminal colors and styles."""
-    bold: str = '\033[1m'
+    bold: str = '\x1b[1m'
     green: str = '\x1b[32m'
     red: str = '\x1b[91m'
     bgreen: str = f'{bold}{green}'
@@ -56,6 +56,9 @@ def load_config() -> SimpleNamespace:
             config_parser.read(path)
             break
 
+    # Define default log file directory here, as it's common for both cases
+    default_log_dir = os.path.expanduser('~/.local/share/brave_checker/logs/')
+
     if not found_config_path:
         print(f'{color.bred}Warning:{color.endc} The config file not found. Default settings will be used.')
         _CONFIG_INSTANCE = SimpleNamespace(
@@ -67,6 +70,7 @@ def load_config() -> SimpleNamespace:
             asset_suffix='.deb',
             asset_arch='amd64',
             pages='1',
+            log_file_dir=default_log_dir,
             config_path=found_config_path
         )
     else:
@@ -79,6 +83,7 @@ def load_config() -> SimpleNamespace:
             asset_suffix=config_parser.get('DEFAULT', 'suffix', fallback='.deb'),
             asset_arch=config_parser.get('DEFAULT', 'arch', fallback='amd64'),
             pages=config_parser.get('DEFAULT', 'pages', fallback='1'),
+            log_file_dir=config_parser.get('DAEMON', 'log_path', fallback=default_log_dir),
             config_path=found_config_path
         )
     return _CONFIG_INSTANCE
