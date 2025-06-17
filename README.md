@@ -122,7 +122,7 @@ Combine this with other options to find a specific release for a channel and arc
 For automatic background checks, you can run brave-releases-checker as a daemon.
 
 * For systemd-based systems (Debian, Ubuntu, Fedora, Arch, openSUSE, etc.):
-  Create a systemd service file. See the example in docs/systemd-service.md (or include it directly here).
+  Create a systemd service file.
 
 * For systems without systemd (e.g., Slackware with SysVinit):
   You can start the daemon at system boot by adding the command to /etc/rc.d/rc.local (or an equivalent boot script):
