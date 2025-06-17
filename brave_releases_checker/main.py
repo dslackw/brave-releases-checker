@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import logging  # Import the logging module
-import os  # To handle file paths for logging
+import logging
+import os
 import subprocess
 import sys
 import time
