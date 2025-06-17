@@ -17,9 +17,34 @@ A simple command-line tool to check for the latest Brave Browser releases from G
 
 ## Installation
 
-```bash
-pip install brave-releases-checker
-```
+Brave Releases Checker is written in Python and requires some system dependencies, especially for desktop notifications.
+
+Step 1: Install Python D-Bus Bindings (Required for Notifications)
+
+Before installing brave-releases-checker, you need to install the D-Bus bindings for Python on your system. This package is typically provided by your distribution's package manager:
+
+* Debian/Ubuntu/Mint: sudo apt install python3-dbus
+* Fedora/RHEL/CentOS: sudo dnf install python3-dbus
+* Arch Linux/Manjaro: sudo pacman -Sy python-dbus
+* openSUSE: sudo zypper install python3-dbus
+* Slackware: Look for the dbus-python or python3-dbus package in the official Slackware packages or on SlackBuilds.org and install it manually.
+
+Step 2: Install Brave Releases Checker
+
+We recommend installing brave-releases-checker system-wide for the smooth operation of desktop notifications:
+
+1. Clone the repository:
+
+    ```bash
+    git clone https://github.com/your-username/brave-releases-checker.git
+    cd brave-releases-checker
+    ```
+
+2. Install using pip: 
+
+    ```bash
+    sudo pip install .
+    ```
 
 ## Usage
 
@@ -94,6 +119,19 @@ Combine this with other options to find a specific release for a channel and arc
 
 ## Daemon Mode
 
+For automatic background checks, you can run brave-releases-checker as a daemon.
+
+* For systemd-based systems (Debian, Ubuntu, Fedora, Arch, openSUSE, etc.):
+  Create a systemd service file. See the example in docs/systemd-service.md (or include it directly here).
+
+* For systems without systemd (e.g., Slackware with SysVinit):
+  You can start the daemon at system boot by adding the command to /etc/rc.d/rc.local (or an equivalent boot script):
+
+```bash
+nohup /usr/local/bin/brc --daemon --interval 60 &
+```
+(Ensure the path /usr/local/bin/brc is correct and adjust the interval as desired.)
+
 Run the Brave Releases Checker in the background as a daemon. It will periodically check for new releases and send desktop notifications when an update is available.
 
 * Run the checker in daemon mode, checking every 60 minutes (default):
@@ -136,12 +174,18 @@ To customize, create the `config.ini` file (you might find a sample in the proje
 Here's an example `config.ini` file:
 
 ```
+[PACKAGE]
+path = /var/log/packages/
 [DEFAULT]
 channel = beta
 suffix = .rpm
 arch = arm64
 pages = 1
 download_path = /tmp/brave_downloads
+[GITHUB]
+token=your_github_personal_access_token_here
+[DAEMON]
+log_path = ~/.local/share/brave_checker/logs/
 ```
 
 You can define default values for channel, suffix, arch, download_path, and the default pages to check. Command-line arguments will always override the settings in the config.ini file.
