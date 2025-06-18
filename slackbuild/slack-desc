@@ -1,0 +1,20 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.
+# Line up the first '|' above the ':' following the base package name, and
+# the '|' on the right side marks the last column you can put a character in.
+# You must make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':' except on otherwise blank lines.
+
+                      |-----handy-ruler------------------------------------------------------|
+brave-releases-checker: brave-releases-checker (Check for the latest Brave Browser releases)
+brave-releases-checker:
+brave-releases-checker: A simple command-line tool to check for the latest Brave Browser
+brave-releases-checker: releases from GitHub. It supports selecting a specific channel
+brave-releases-checker: (stable, beta, nightly), filtering by architecture, file suffix,
+brave-releases-checker: and even listing all available releases based on your criteria.
+brave-releases-checker: Configuration can be managed through a config.ini file for
+brave-releases-checker: persistent settings.
+brave-releases-checker:
+brave-releases-checker: Homepage: https://github.com/dslackw/brave-releases-checker
+brave-releases-checker:
+
