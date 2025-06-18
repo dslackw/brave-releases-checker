@@ -262,7 +262,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         print('=' * 50 + '\n')
         sys.exit(0)
 
-    def _check_and_download(self, installed_version: version.Version, all_found_assets: list[Any]) -> None:  # pylint: disable=[R0912,R0915]
+    def _check_and_download(self, installed_version: version.Version, all_found_assets: list[Any]) -> None:
         """Checks for newer versions and offers to download."""
         asset_version_arg = self.args.asset_version
         download_folder = self.args.download_path
@@ -273,17 +273,22 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         if self.args.list:
             self._list_assets_found(all_found_assets)
 
-        # Do not print headers and footers in daemon mode
         if not self.args.daemon:
-            print('\n' + '=' * 50)
-            print(f'{self.color.bold}Brave Releases Checker{self.color.endc}')
-            print(f'{self.color.bold}Channel:{self.color.endc} {self.args.channel.capitalize()}')
-            print(f'{self.color.bold}Architecture:{self.color.endc} {self.args.arch}')
-            print(f'{self.color.bold}File Suffix:{self.color.endc} {self.args.suffix}')
-            print(f'{self.color.bold}Checking Page:{self.color.endc} {self.args.pages}')
-            print('-' * 50)
-            print(f'{self.color.bold}Installed Version:{self.color.endc} v{installed_version}')
-            print('=' * 50)
+            label_max_len = max(
+                len("Channel:"),
+                len("Architecture:"),
+                len("File Suffix:"),
+                len("Checking Page:")
+            ) + 2
+
+            print(f'\n{self.color.bold}Brave Releases Checker{self.color.endc}')
+            print('-' * (len("Brave Releases Checker")))
+
+            print(f'{self.color.bold}{"Channel:":<{label_max_len}}{self.color.endc} {self.args.channel.capitalize()}')
+            print(f'{self.color.bold}{"Architecture:":<{label_max_len}}{self.color.endc} {self.args.arch}')
+            print(f'{self.color.bold}{"File Suffix:":<{label_max_len}}{self.color.endc} {self.args.suffix}')
+            print(f'{self.color.bold}{"Checking Page:":<{label_max_len}}{self.color.endc} {self.args.pages}')
+            print(f'\n{self.color.bold}Installed Version:{self.color.endc} v{installed_version}')
 
         filtered_assets = []
         if asset_version_arg:
@@ -296,11 +301,11 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             else:
                 msg = f'No asset found for version v{asset_version_arg} with the specified criteria.'
                 if self.args.daemon:
-                    self.logger.error(msg)  # Log error instead of print
+                    self.logger.error(msg)
                     self.send_notification("Brave Update Error", msg)
                 else:
-                    print(f'\n{self.color.bred}Error:{self.color.endc} {msg}')
-                    print('=' * 50 + '\n')
+                    print(f'{self.color.bred}Error:{self.color.endc} {msg}')
+                    print('-' * len(msg))
                 return
         elif all_found_assets:
             all_found_assets.sort(key=lambda x: version.parse(x['version']), reverse=True)
@@ -309,19 +314,18 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             msg = (f'No {self.args.channel.capitalize()} {self.args.suffix} files for'
                    f' {self.args.arch} were found on page {self.args.pages}.')
             if self.args.daemon:
-                self.logger.info(msg)  # Log info instead of print
+                self.logger.info(msg)
             else:
-                print(f'\n{self.color.bold}{msg}{self.color.endc}\n')
-                print('=' * 50 + '\n')
+                print(f'{self.color.bold}{msg}{self.color.endc}')
+                print('-' * len(msg))
             return
 
         latest_version = version.parse(latest_asset['version'])
-        asset_file = latest_asset['asset_name']  # Corrected to use 'asset_name'
+        asset_file = latest_asset['asset_name']
         tag_version = latest_asset['tag_name']
 
         if not self.args.daemon:
-            print(f'{self.color.bold}Latest Version Available:{self.color.endc} v{latest_version} ({latest_asset['asset_name']})')
-            print('=' * 50)
+            print(f'{self.color.bold}Latest Available:{self.color.endc} v{latest_version} ({latest_asset['asset_name']})')
 
         if latest_version > installed_version:
             msg = f'A newer version is available: v{latest_version}'
@@ -339,7 +343,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             if answer.lower() == 'y':
                 self._download_asset_file(tag_version, asset_file)
             else:
-                print('\nDownload skipped.')
+                print('Download skipped.')
         elif asset_version_arg:
             msg = f'The specified version (v{latest_version}) matches the latest available.'
             if not self.args.daemon:  # Print only for CLI
@@ -353,20 +357,20 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             else:  # For daemon, log info
                 self.logger.info(msg)
 
-        if not self.args.daemon:  # Print final separator only if not in daemon mode
-            print('=' * 50 + '\n')
-
     def _download_asset_file(self, tag_version: str, asset_file: str) -> None:
         """Download the asset file."""
         download_url = f'{self.download_url}{tag_version}/{asset_file}'
-        print(f'\n{self.color.bold}Downloading:{self.color.endc} {asset_file} to:\n'
-              f'  {self.download_folder}')
+
+        print(f'\n{self.color.bold}Downloading:{self.color.endc} {asset_file}')
+        print(f'  Target directory: {self.download_folder}\n')
         subprocess.call(
             f"wget -c -q --tries=3 --progress=bar:force:noscroll --show-progress "
             f"--directory-prefix={self.download_folder} '{download_url}'", shell=True
         )
-        print(f'\n{self.color.bgreen}Download complete!{self.color.endc} File saved in: \n'
-              f'  {self.download_folder}{asset_file}')
+
+        full_download_path = os.path.join(self.download_folder, asset_file)
+        print(f'\n{self.color.bgreen}Download complete!{self.color.endc} File saved:')
+        print(f'  {full_download_path}\n')
 
     def run(self) -> None:
         """Main method to check and download releases. This is called once per execution or repeatedly in daemon mode."""
