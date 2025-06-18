@@ -276,7 +276,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         print('=' * 50 + '\n')
         sys.exit(0)
 
-    def _check_and_download(self, installed_version: version.Version, all_found_assets: list[Any]) -> None:
+    def _check_and_download(self, installed_version: version.Version, all_found_assets: list[Any]) -> None:  # pylint: disable=[R0912,R0915]
         """Checks for newer versions and offers to download.
 
         Args:
