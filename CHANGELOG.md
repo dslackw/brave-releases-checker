@@ -5,7 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.2] - 2025-06-18
+### Added
+- **Added notification timeout:** Implemented a configurable timeout for desktop notifications. Users can now specify how long notifications remain visible.
+### Updated
+- **Updated development status:** Promoted project to Production/Stable status, indicating readiness for general use.
+
 ## [0.3.1] - 2025-06-17
+### Added
 - **Added Daemon Mode:** Introducing a new `--daemon` option to run the Brave Releases Checker in the background. It periodically checks for updates and sends desktop notifications.
 - **Enhanced Logging for Daemon:** All daemon operations, warnings, and errors are now comprehensively logged to `~/.local/share/brave_checker/logs/brave_checker.log` for easier monitoring and debugging.
 

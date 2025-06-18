@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "brave-releases-checker"
-version = "0.3.1"
+version = "0.3.2"
 authors = [
   { name="Dimitris Zlatanidis", email="dslackw@gmail.com" },
 ]
