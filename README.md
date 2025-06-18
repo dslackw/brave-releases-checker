@@ -186,6 +186,7 @@ download_path = /tmp/brave_downloads
 token=your_github_personal_access_token_here
 [DAEMON]
 log_path = ~/.local/share/brave_checker/logs/
+notification_timeout = 5000
 ```
 
 You can define default values for channel, suffix, arch, download_path, and the default pages to check. Command-line arguments will always override the settings in the config.ini file.
