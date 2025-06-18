@@ -8,7 +8,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
-from typing import Any, Union
+from typing import Any, Callable, Union
 
 import distro
 import notify2
@@ -69,16 +69,16 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         setting headers for GitHub API requests, and parsing command-line arguments.
         """
         self.download_folder = str(config.download_folder)
-        self.channel = config.channel
-        self.asset_suffix = config.asset_suffix
-        self.asset_arch = config.asset_arch
-        self.pages = config.pages
+        self.channel: str = config.channel
+        self.asset_suffix: str = config.asset_suffix
+        self.asset_arch: str = config.asset_arch
+        self.pages: str = config.pages
         self.color = Colors()
         self.logger = logger  # Make the global logger available in the class
 
-        self.download_url = 'https://github.com/brave/brave-browser/releases/download/'
-        self.repo = 'brave/brave-browser'
-        self.headers = {
+        self.download_url: str = 'https://github.com/brave/brave-browser/releases/download/'
+        self.repo: str = 'brave/brave-browser'
+        self.headers: dict[str, str] = {
             'Accept': 'application/vnd.github.v3+json',
             'Authorization': f'{config.github_token}'
         }
@@ -130,7 +130,12 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         return args
 
     def send_notification(self, summary: str, body: str) -> None:
-        """Sends a D-Bus notification using notify2."""
+        """Sends a D-Bus notification using notify2.
+
+        Args:
+            summary (str): Summary text.
+            body (str): Body text.
+        """
         if self.notifications_enabled:
             try:
                 n = notify2.Notification(summary, body, 'brave-browser')
@@ -147,7 +152,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         distribution = distro.id().lower()
         version_info = None
 
-        distribution_handlers = {
+        distribution_handlers: dict[str, Callable[[], Union[version.Version, None]]] = {
             'slackware': self.installed_version.get_slackware,
             'ubuntu': self.installed_version.get_debian_dpkg,
             'debian': self.installed_version.get_debian_dpkg,
@@ -174,7 +179,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
     def _fetch_github_releases(self) -> list[str]:
         """Fetches Brave Browser releases from GitHub API based on criteria."""
         all_assets: list[str] = []
-        total_pages = self.args.end_page - self.args.start_page + 1
+        total_pages: int = self.args.end_page - self.args.start_page + 1
 
         for _, page in enumerate(range(self.args.start_page, self.args.end_page + 1)):
             if not self.args.daemon:
@@ -214,7 +219,12 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         return all_assets
 
     def _process_releases_for_page(self, releases: list[Any], all_assets: list[Any]) -> None:
-        """Processes the releases fetched from a single GitHub API page."""
+        """Processes the releases fetched from a single GitHub API page.
+
+        Args:
+            releases (list[Any]): All releases.
+            all_assets (list[Any]): All assets.
+        """
         build_release_lower = self.args.channel.lower()
         brave_asset_suffix = self.args.suffix
         arch = self.args.arch
@@ -244,7 +254,11 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
                         })
 
     def _list_assets_found(self, all_found_assets: list[Any]) -> None:
-        """List all available releases based on criteria."""
+        """List all available releases based on criteria.
+
+        Args:
+            all_found_assets (list[Any]): All assets found.
+        """
         print('\n' + '=' * 50)
         print(f'{self.color.bold}Available Brave Releases{self.color.endc}')
         print(f'{self.color.bold}Channel:{self.color.endc} {self.args.channel.capitalize()}')
@@ -263,9 +277,17 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         sys.exit(0)
 
     def _check_and_download(self, installed_version: version.Version, all_found_assets: list[Any]) -> None:
-        """Checks for newer versions and offers to download."""
-        asset_version_arg = self.args.asset_version
-        download_folder = self.args.download_path
+        """Checks for newer versions and offers to download.
+
+        Args:
+            installed_version (version.Version): Distribution installed version.
+            all_found_assets (list[Any]): All assets found.
+
+        Returns:
+            None: No return.
+        """
+        asset_version_arg: str = self.args.asset_version
+        download_folder: str = self.args.download_path
 
         if download_folder:
             self.download_folder = download_folder
@@ -290,7 +312,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             print(f'{self.color.bold}{"Checking Page:":<{label_max_len}}{self.color.endc} {self.args.pages}')
             print(f'\n{self.color.bold}Installed Version:{self.color.endc} v{installed_version}')
 
-        filtered_assets = []
+        filtered_assets: list[dict[str, Any]] = []
         if asset_version_arg:
             target_version = version.parse(asset_version_arg)
             for asset in all_found_assets:
@@ -299,7 +321,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             if filtered_assets:
                 latest_asset = filtered_assets[0]
             else:
-                msg = f'No asset found for version v{asset_version_arg} with the specified criteria.'
+                msg: str = f'No asset found for version v{asset_version_arg} with the specified criteria.'
                 if self.args.daemon:
                     self.logger.error(msg)
                     self.send_notification("Brave Update Error", msg)
@@ -358,7 +380,12 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
                 self.logger.info(msg)
 
     def _download_asset_file(self, tag_version: str, asset_file: str) -> None:
-        """Download the asset file."""
+        """Download the asset file.
+
+        Args:
+            tag_version (str): Tag version.
+            asset_file (str): Asset file.
+        """
         download_url = f'{self.download_url}{tag_version}/{asset_file}'
 
         print(f'\n{self.color.bold}Downloading:{self.color.endc} {asset_file}')

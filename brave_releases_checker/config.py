@@ -9,15 +9,15 @@ from types import SimpleNamespace
 
 
 @dataclass
-class Colors:
+class Colors:  # pylint: disable=[R0902]
     """Represents ANSI escape codes for terminal colors and styles."""
     bold: str = '\x1b[1m'
     green: str = '\x1b[32m'
     red: str = '\x1b[91m'
     bgreen: str = f'{bold}{green}'
     bred: str = f'{bold}{red}'
-    yellow = '\x1b[93m'
-    byellow = f'{bold}{yellow}'
+    yellow: str = '\x1b[93m'
+    byellow: str = f'{bold}{yellow}'
     endc: str = '\x1b[0m'
 
 
@@ -45,7 +45,7 @@ def load_config() -> SimpleNamespace:
 
     color = Colors()
     config_parser = configparser.ConfigParser()
-    config_paths = [
+    config_paths: list[str] = [
         '/etc/brave-releases-checker/config.ini',
         os.path.expanduser('~/.config/brave-releases-checker/config.ini')
     ]
@@ -59,9 +59,9 @@ def load_config() -> SimpleNamespace:
     # Define default log file directory here, as it's common for both cases
     default_log_dir = os.path.expanduser('~/.local/share/brave_checker/logs/')
     # Define default notification timeout here
-    default_notification_timeout = 5000  # 5 seconds
+    default_notification_timeout: int = 5000  # 5 seconds
     # Default Wget options
-    default_wget_options = "-c -q --tries=3 --progress=bar:force:noscroll --show-progress"
+    default_wget_options: str = "-c -q --tries=3 --progress=bar:force:noscroll --show-progress"
 
     if not found_config_path:
         print(f'{color.bred}Warning:{color.endc} The config file not found. Default settings will be used.')

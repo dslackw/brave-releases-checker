@@ -22,12 +22,13 @@ class InstalledVersion:
     on various operating systems.
 
     Attributes:
+        args (TYPE): Description
+        color (Colors): An instance of the Colors class for colored output.
         log_packages (Path): The path to the directory where package information
                              might be stored.
+        logger (logging.Logger): The logger instance for recording events.
         package_name_prefix (str): The expected prefix of the Brave Browser
                                    package name (read from configuration).
-        color (Colors): An instance of the Colors class for colored output.
-        logger (logging.Logger): The logger instance for recording events.
     """
 
     def __init__(self, args: argparse.Namespace) -> None:
@@ -44,8 +45,8 @@ class InstalledVersion:
 
         Args:
             message (str): The message to output.
-            level (str): The logging level ('info', 'warning', 'error').
-            color_code (str): ANSI color code for console output.
+            level (str, optional): The logging level ('info', 'warning', 'error').
+            color_code (str, optional): ANSI color code for console output.
         """
         if self.args.daemon:
             if level == 'info':
@@ -61,24 +62,32 @@ class InstalledVersion:
             print(f"{color_code}{message}{self.color.endc}" if color_code else message)
 
     def get_slackware(self) -> Union[version.Version, None]:
-        """Gets installed version on Slackware."""
-        brave_package = list(self.log_packages.glob(f'{self.package_name_prefix}*'))
+        """Gets installed version on Slackware.
+
+        Returns:
+            Union[version.Version, None]: Installed version.
+        """
+        brave_package: list[Path] = list(self.log_packages.glob(f'{self.package_name_prefix}*'))
         if brave_package:
-            installed_info = str(brave_package[0]).rsplit('/', maxsplit=1)[-1]
-            version_str = installed_info.split('-')[2]
+            installed_info: str = str(brave_package[0]).rsplit('/', maxsplit=1)[-1]
+            version_str: str = installed_info.split('-')[2]
             self._output_message(f'Installed Package (Slackware): {installed_info}')
             return version.parse(version_str)
         self._output_message("Brave Browser package not found for Slackware.", level='info')  # Use info for "not found" which isn't an error
         return None
 
     def get_debian_dpkg(self) -> Union[version.Version, None]:
-        """Gets installed version on Debian-based systems, with fallback to snap on Ubuntu."""
+        """Gets installed version on Debian-based systems, with fallback to snap on Ubuntu.
+
+        Returns:
+            Union[version.Version, None]: Installed version.
+        """
         try:
             process = subprocess.run(['dpkg', '-s', self.package_name_prefix], capture_output=True, text=True, check=True)
             output = process.stdout
             for line in output.splitlines():
                 if line.startswith('Version:'):
-                    version_str = line.split(':')[-1].strip()
+                    version_str: str = line.split(':')[-1].strip()
                     self._output_message(f'Installed Package (Debian): {self.package_name_prefix} - Version: {version_str}')
                     return version.parse(version_str)
             self._output_message(f'Package {self.package_name_prefix} not found or version info missing via dpkg.', level='warning')
@@ -100,7 +109,11 @@ class InstalledVersion:
         return None
 
     def _get_debian_snap(self) -> Union[version.Version, None]:
-        """Gets installed version on systems with snapd where Brave is installed as a snap."""
+        """Gets installed version on systems with snapd where Brave is installed as a snap.
+
+        Returns:
+            Union[version.Version, None]: Installed version.
+        """
         try:
             process = subprocess.run(['snap', 'info', 'brave'], capture_output=True, text=True, check=True)
             output = process.stdout
@@ -125,27 +138,35 @@ class InstalledVersion:
         return None
 
     def get_rpm_dnf(self) -> Union[version.Version, None]:
-        """Gets installed version on RPM-based systems."""
+        """Gets installed version on RPM-based systems.
+
+        Returns:
+            Union[version.Version, None]: Installed version.
+        """
         process = subprocess.run(['dnf', 'list', self.package_name_prefix], capture_output=True, text=True, check=False)
         if process.returncode == 0:
             output = process.stdout
             for line in output.splitlines():
                 if line.startswith(self.package_name_prefix):
-                    version_str = line.split()[1].split('-')[0].strip()
+                    version_str: str = line.split()[1].split('-')[0].strip()
                     self._output_message(f'Installed Package (RPM): {self.package_name_prefix} - Version: {version_str}')
                     return version.parse(version_str)
         self._output_message(f'Package {self.package_name_prefix} not found or version info missing via dnf.', level='warning')
         return None
 
     def get_arch(self) -> Union[version.Version, None]:
-        """Gets installed version on Arch Linux."""
+        """Gets installed version on Arch Linux.
+
+        Returns:
+            Union[version.Version, None]: Installed version.
+        """
         try:
             process = subprocess.run(['pacman', '-Qi', self.package_name_prefix], capture_output=True, text=True, check=True)
             if process.returncode == 0:
                 output = process.stdout
                 for line in output.splitlines():
                     if line.startswith('Version'):
-                        version_str = line.split(':')[-1].strip()
+                        version_str: str = line.split(':')[-1].strip()
                         self._output_message(f'Installed Package (Arch): {self.package_name_prefix} - Version: {version_str}')
                         return version.parse(version_str)
             self._output_message(f'Package {self.package_name_prefix} not found or version info missing via pacman.', level='warning')
@@ -156,13 +177,17 @@ class InstalledVersion:
         return None
 
     def get_opensuse(self) -> Union[version.Version, None]:
-        """Gets installed version on openSUSE."""
+        """Gets installed version on openSUSE.
+
+        Returns:
+            Union[version.Version, None]: Installed version.
+        """
         process = subprocess.run(['zypper', 'info', self.package_name_prefix], capture_output=True, text=True, check=False)
         if process.returncode == 0:
             output = process.stdout
             for line in output.splitlines():
                 if line.startswith('Version'):
-                    version_str = line.split(':')[1].split('-')[0].strip()
+                    version_str: str = line.split(':')[1].split('-')[0].strip()
                     self._output_message(f'Installed Package (openSUSE): {self.package_name_prefix} - Version: {version_str}')
                     return version.parse(version_str)
         self._output_message(f'Package {self.package_name_prefix} not found or version info missing via zypper.', level='warning')
