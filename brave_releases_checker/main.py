@@ -336,15 +336,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
                 print('\nDownload cancelled.')
                 sys.exit(1)
             if answer.lower() == 'y':
-                download_url = f'{self.download_url}{tag_version}/{asset_file}'
-                print(f'\n{self.color.bold}Downloading:{self.color.endc} {asset_file} to:\n'
-                      f'  {self.download_folder}')
-                subprocess.call(
-                    f"wget -c -q --tries=3 --progress=bar:force:noscroll --show-progress "
-                    f"--directory-prefix={self.download_folder} '{download_url}'", shell=True
-                )
-                print(f'\n{self.color.bgreen}Download complete!{self.color.endc} File saved in: \n'
-                      f'  {self.download_folder}{asset_file}')
+                self._download_asset_file(tag_version, asset_file)
             else:
                 print('\nDownload skipped.')
         elif asset_version_arg:
@@ -362,6 +354,18 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
 
         if not self.args.daemon:  # Print final separator only if not in daemon mode
             print('=' * 50 + '\n')
+
+    def _download_asset_file(self, tag_version: str, asset_file: str) -> None:
+        """Download the asset file."""
+        download_url = f'{self.download_url}{tag_version}/{asset_file}'
+        print(f'\n{self.color.bold}Downloading:{self.color.endc} {asset_file} to:\n'
+              f'  {self.download_folder}')
+        subprocess.call(
+            f"wget -c -q --tries=3 --progress=bar:force:noscroll --show-progress "
+            f"--directory-prefix={self.download_folder} '{download_url}'", shell=True
+        )
+        print(f'\n{self.color.bgreen}Download complete!{self.color.endc} File saved in: \n'
+              f'  {self.download_folder}{asset_file}')
 
     def run(self) -> None:
         """Main method to check and download releases. This is called once per execution or repeatedly in daemon mode."""
