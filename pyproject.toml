@@ -27,5 +27,11 @@ dependencies = [
 [project.scripts]
 brc = "brave_releases_checker.main:main"
 
+[project.urls]
+Homepage = "https://github.com/dslackw/brave-releases-checker"
+Documentation = "https://github.com/dslackw/brave-releases-checker/blob/main/README.md"
+Repository = "https://github.com/dslackw/brave-releases-checker.git"
+Changelog = "https://github.com/dslackw/brave-releases-checker/blob/main/CHANGELOG.md"
+
 [tool.flit.sdist]
 include = ["config.ini"]
