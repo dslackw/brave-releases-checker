@@ -60,6 +60,8 @@ def load_config() -> SimpleNamespace:
     default_log_dir = os.path.expanduser('~/.local/share/brave_checker/logs/')
     # Define default notification timeout here
     default_notification_timeout = 5000  # 5 seconds
+    # Default Wget options
+    default_wget_options = "-c -q --tries=3 --progress=bar:force:noscroll --show-progress"
 
     if not found_config_path:
         print(f'{color.bred}Warning:{color.endc} The config file not found. Default settings will be used.')
@@ -74,6 +76,7 @@ def load_config() -> SimpleNamespace:
             pages='1',
             log_file_dir=default_log_dir,
             notification_timeout=5000,
+            wget_options=default_wget_options,
             config_path=found_config_path,
         )
     else:
@@ -88,6 +91,7 @@ def load_config() -> SimpleNamespace:
             pages=config_parser.get('DEFAULT', 'pages', fallback='1'),
             log_file_dir=config_parser.get('DAEMON', 'log_path', fallback=default_log_dir),
             notification_timeout=config_parser.getint('DAEMON', 'notification_timeout', fallback=default_notification_timeout),
+            wget_options=config_parser.get('DOWNLOAD', 'wget_options', fallback=default_wget_options),
             config_path=found_config_path
         )
     return _CONFIG_INSTANCE

@@ -364,7 +364,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         print(f'\n{self.color.bold}Downloading:{self.color.endc} {asset_file}')
         print(f'  Target directory: {self.download_folder}\n')
         subprocess.call(
-            f"wget -c -q --tries=3 --progress=bar:force:noscroll --show-progress "
+            f"wget {config.wget_options} "
             f"--directory-prefix={self.download_folder} '{download_url}'", shell=True
         )
 

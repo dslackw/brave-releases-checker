@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.3.2] - 2025-06-18
 ### Added
 - **Added notification timeout:** Implemented a configurable timeout for desktop notifications. Users can now specify how long notifications remain visible.
+- **Added wget options:** Enhanced download flexibility: `wget` command-line options can now be customized by users via the `wget_options` setting in `config.ini`.
 ### Updated
 - **Updated development status:** Promoted project to Production/Stable status, indicating readiness for general use.
 
