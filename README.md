@@ -52,6 +52,30 @@ Use the brc script from your command line with various options to tailor your re
 
 ```bash
 brc --help
+usage: brc [-h] [--channel {stable,beta,nightly}] [--suffix {.deb,.rpm,.tar.gz,.apk,.zip,.dmg,.pkg}]
+           [--arch {amd64,arm64,aarch64,x86_64}] [--download-path DOWNLOAD_PATH]
+           [--asset-version ASSET_VERSION] [--pages PAGES] [--list] [--daemon] [--interval INTERVAL]
+           [--version]
+
+Check and download Brave Browser releases.
+
+options:
+  -h, --help            show this help message and exit
+  --channel {stable,beta,nightly}
+                        Release channel to check
+  --suffix {.deb,.rpm,.tar.gz,.apk,.zip,.dmg,.pkg}
+                        Asset file suffix to filter
+  --arch {amd64,arm64,aarch64,x86_64}
+                        Architecture to filter
+  --download-path DOWNLOAD_PATH
+                        Path to download
+  --asset-version ASSET_VERSION
+                        Specify the asset version
+  --pages PAGES         Page number or range (e.g., 1 or 1-5) of releases to fetch
+  --list                List available releases based on criteria
+  --daemon              Run in daemon mode, checking periodically.
+  --interval INTERVAL   Interval in minutes for daemon mode checks (default: 60)
+  --version             show program's version number and exit
 ```
 
 ### Basic Checks
