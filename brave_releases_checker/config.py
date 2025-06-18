@@ -58,6 +58,8 @@ def load_config() -> SimpleNamespace:
 
     # Define default log file directory here, as it's common for both cases
     default_log_dir = os.path.expanduser('~/.local/share/brave_checker/logs/')
+    # Define default notification timeout here
+    default_notification_timeout = 5000  # 5 seconds
 
     if not found_config_path:
         print(f'{color.bred}Warning:{color.endc} The config file not found. Default settings will be used.')
@@ -71,7 +73,8 @@ def load_config() -> SimpleNamespace:
             asset_arch='amd64',
             pages='1',
             log_file_dir=default_log_dir,
-            config_path=found_config_path
+            notification_timeout=5000,
+            config_path=found_config_path,
         )
     else:
         _CONFIG_INSTANCE = SimpleNamespace(
@@ -84,6 +87,7 @@ def load_config() -> SimpleNamespace:
             asset_arch=config_parser.get('DEFAULT', 'arch', fallback='amd64'),
             pages=config_parser.get('DEFAULT', 'pages', fallback='1'),
             log_file_dir=config_parser.get('DAEMON', 'log_path', fallback=default_log_dir),
+            notification_timeout=config_parser.getint('DAEMON', 'notification_timeout', fallback=default_notification_timeout),
             config_path=found_config_path
         )
     return _CONFIG_INSTANCE

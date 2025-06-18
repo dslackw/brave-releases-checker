@@ -134,6 +134,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         if self.notifications_enabled:
             try:
                 n = notify2.Notification(summary, body, 'brave-browser')
+                n.set_timeout(config.notification_timeout)
                 n.show()
                 self.logger.info("Notification sent: Summary='%s', Body='%s'", summary, body)
             except Exception as e:  # pylint: disable=[W0718]
