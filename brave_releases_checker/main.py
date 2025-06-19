@@ -113,11 +113,6 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
         args = parser.parse_args()
 
-        print(f"DEBUGGING (Python {sys.version_info.major}.{sys.version_info.minor}):")
-        print(f"  config.pages value: '{config.pages}' (Type: {type(config.pages)})") # Έλεγξε την αρχική τιμή από το config
-        print(f"  self.pages value: '{self.pages}' (Type: {type(self.pages)})") # Έλεγξε την τιμή μετά την εκκίνηση
-        print(f"  args.pages value before int() conversion: '{args.pages}' (Type: {type(args.pages)})")
-
         try:
             if '-' in args.pages:
                 start_page_str, end_page_str = args.pages.split('-')
