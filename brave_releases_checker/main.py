@@ -182,10 +182,13 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         """Fetches Brave Browser releases from GitHub API based on criteria."""
         all_assets: list[str] = []
         total_pages: int = self.args.end_page - self.args.start_page + 1
+        msg_page: str = 'Page'
+        if total_pages > 1:
+            msg_page = 'Pages'
 
         for _, page in enumerate(range(self.args.start_page, self.args.end_page + 1)):
             if not self.args.daemon:
-                status_message = f"{self.color.bold}Connecting to GitHub (Page {page}/{total_pages})... {self.color.endc}"
+                status_message = f"{self.color.bold}Connecting to GitHub ({msg_page} {page}/{total_pages})... {self.color.endc}"
                 sys.stdout.write(f"\r{status_message}")  # Use \r to overwrite the previous line
                 sys.stdout.flush()
             try:
@@ -194,7 +197,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
                 releases = response.json()
                 self._process_releases_for_page(releases, all_assets)
             except requests.exceptions.Timeout:
-                msg = f"Connection to GitHub (Page {page}) timed out."
+                msg = f"Connection to GitHub ({msg_page} {page}) timed out."
                 if self.args.daemon:
                     self.logger.error(msg)
                     self.send_notification("Brave Checker Error", msg)
@@ -204,7 +207,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
                 sys.stdout.flush()
                 sys.exit(1)
             except requests.exceptions.RequestException as e:
-                msg = f"Failed to download releases from GitHub (Page {page}): {e}"
+                msg = f"Failed to download releases from GitHub ({msg_page} {page}): {e}"
                 if self.args.daemon:
                     self.logger.error(msg)
                     self.send_notification("Brave Checker Error", msg)
@@ -215,7 +218,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
                 sys.exit(1)
 
         if not self.args.daemon:
-            sys.stdout.write(f'\r{self.color.bold}Connecting to GitHub (Pages {self.args.start_page}-{self.args.end_page})... '
+            sys.stdout.write(f'\r{self.color.bold}Connecting to GitHub ({msg_page} {self.args.start_page}-{self.args.end_page})... '
                              f'{self.color.bgreen}Done{self.color.endc}{" " * 40}\n')
             sys.stdout.flush()
         return all_assets
