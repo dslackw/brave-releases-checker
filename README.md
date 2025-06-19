@@ -82,7 +82,23 @@ options:
 
 * Check the latest stable release for the default architecture (configured in config.ini or defaults to amd64):
     ```bash
-    brc
+    $ brc
+    Installed Package (Slackware): brave-browser-1.80.110-x86_64-1_SBo
+    Connecting to GitHub (Pages 1-1)... Done
+
+    Brave Releases Checker
+    ----------------------
+    Channel:         Stable
+    Architecture:    amd64
+    File Suffix:     .deb
+    Checking Page:   1
+
+    Installed Version: v1.80.110
+    Latest Available: v1.80.110 (brave-browser_1.80.110_amd64.deb)
+
+    A newer version is available: v1.80.110
+
+    Do you want to download it? [y/N]
     ```
 
 * Check the latest stable release for a specific architecture:

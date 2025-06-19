@@ -351,6 +351,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         if not self.args.daemon:
             print(f'{self.color.bold}Latest Available:{self.color.endc} v{latest_version} ({latest_asset['asset_name']})')
 
+        installed_version = version.parse('1.79.126')
         if latest_version > installed_version:
             msg = f'A newer version is available: v{latest_version}'
             if self.args.daemon:
