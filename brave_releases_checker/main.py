@@ -200,7 +200,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
                     self.send_notification("Brave Checker Error", msg)
                     return []  # Return empty list in daemon mode to continue the loop
 
-                sys.stdout.write(f"\r{self.color.bred}Error:{self.color.endc} {msg}{" " * 40}\n")
+                sys.stdout.write(f"\r{self.color.bred}Error:{self.color.endc} {msg}{' ' * 40}\n")
                 sys.stdout.flush()
                 sys.exit(1)
             except requests.exceptions.RequestException as e:
@@ -210,7 +210,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
                     self.send_notification("Brave Checker Error", msg)
                     return []  # Return empty list in daemon mode to continue the loop
 
-                sys.stdout.write(f"\r{self.color.bred}Error:{self.color.endc} {msg}{" " * 40}\n")
+                sys.stdout.write(f"\r{self.color.bred}Error:{self.color.endc} {msg}{' ' * 40}\n")
                 sys.stdout.flush()
                 sys.exit(1)
 
