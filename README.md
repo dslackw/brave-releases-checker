@@ -73,7 +73,7 @@ options:
                         Specify the asset version
   --pages PAGES         Page number or range (e.g., 1 or 1-5) of releases to fetch
   --list                List available releases based on criteria
-  --daemon              Run in daemon mode, checking periodically.
+  --daemon              Run in daemon mode, checking periodically
   --interval INTERVAL   Interval in minutes for daemon mode checks (default: 60)
   --version             show program's version number and exit
 ```
