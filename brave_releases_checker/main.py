@@ -97,7 +97,9 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
 
     def _parse_arguments(self) -> argparse.Namespace:
         """Parses command-line arguments."""
-        parser = argparse.ArgumentParser(description='Check and download Brave Browser releases.')
+        parser = argparse.ArgumentParser(
+            description='Check and download Brave Browser releases.',
+            epilog="For more detailed information, please refer to the project's documentation.")
         parser.add_argument('--channel', default=self.channel, choices=['stable', 'beta', 'nightly'], help='Release channel to check')
         parser.add_argument('--suffix', default=self.asset_suffix, choices=['.deb', '.rpm', '.tar.gz', '.apk', '.zip', '.dmg', '.pkg'],
                             help='Asset file suffix to filter')
@@ -106,7 +108,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         parser.add_argument('--asset-version', help='Specify the asset version')
         parser.add_argument('--pages', type=str, default=self.pages, help='Page number or range (e.g., 1 or 1-5) of releases to fetch')
         parser.add_argument('--list', action='store_true', help='List available releases based on criteria')
-        parser.add_argument('--daemon', action='store_true', help='Run in daemon mode, checking periodically.')
+        parser.add_argument('--daemon', action='store_true', help='Run in daemon mode, checking periodically')
         parser.add_argument('--interval', type=int, default=60, help='Interval in minutes for daemon mode checks (default: 60)')
         parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
         args = parser.parse_args()
