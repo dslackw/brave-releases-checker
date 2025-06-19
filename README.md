@@ -101,6 +101,36 @@ options:
     Do you want to download it? [y/N]
     ```
 
+* List of latest stable releases from pages 1 to 5:
+    ```bash
+    brc --list --pages 1-5
+    Installed Package (Slackware): brave-browser-1.80.110-x86_64-1_SBo
+    Connecting to GitHub (Pages 1-5)... Done
+
+    Brave Releases Checker
+    ----------------------
+    Channel:        Stable
+    Architecture:   amd64
+    File Suffix:    .deb
+    Checking Page:  1-5
+
+    Version         Filename
+    ------------------------------------------------
+    1.80.110        brave-browser_1.80.110_amd64.deb
+    1.79.126        brave-browser_1.79.126_amd64.deb
+    1.79.125        brave-browser_1.79.125_amd64.deb
+    1.79.123        brave-browser_1.79.123_amd64.deb
+    1.79.121        brave-browser_1.79.121_amd64.deb
+    1.79.119        brave-browser_1.79.119_amd64.deb
+    1.79.118        brave-browser_1.79.118_amd64.deb
+    1.79.117        brave-browser_1.79.117_amd64.deb
+    1.79.116        brave-browser_1.79.116_amd64.deb
+    1.79.115        brave-browser_1.79.115_amd64.deb
+    1.79.114        brave-browser_1.79.114_amd64.deb
+    1.79.113        brave-browser_1.79.113_amd64.deb
+    1.79.112        brave-browser_1.79.112_amd64.deb
+    ```
+
 * Check the latest stable release for a specific architecture:
     ```bash
     brc --channel stable --arch arm64

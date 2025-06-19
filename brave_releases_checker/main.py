@@ -261,21 +261,26 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         Args:
             all_found_assets (list[Any]): All assets found.
         """
-        print('\n' + '=' * 50)
-        print(f'{self.color.bold}Available Brave Releases{self.color.endc}')
-        print(f'{self.color.bold}Channel:{self.color.endc} {self.args.channel.capitalize()}')
-        print(f'{self.color.bold}Architecture:{self.color.endc} {self.args.arch}')
-        print(f'{self.color.bold}File Suffix:{self.color.endc} {self.args.suffix}')
-        print(f'{self.color.bold}Page:{self.color.endc} {self.args.pages}')
-        print('-' * 50)
+        print(f'\n{self.color.bold}Brave Releases Checker{self.color.endc}')
+        print('-' * 22)
+        print(f'{self.color.bold}{"Channel:":<15}{self.color.endc} {self.args.channel.capitalize()}')
+        print(f'{self.color.bold}{"Architecture:":<15}{self.color.endc} {self.args.arch}')
+        print(f'{self.color.bold}{"File Suffix:":<15}{self.color.endc} {self.args.suffix}')
+        print(f'{self.color.bold}{"Checking Page:":<15}{self.color.endc} {self.args.pages}')
+
         if all_found_assets:
-            print(f'{self.color.bold}{'Version':<15} {'Filename'}{self.color.endc}')
-            print('-' * 50)
+            max_asset_line_length = len(f'{"Version":<15} {"Filename"}')
+
             for asset in all_found_assets:
-                print(f'{asset['version']:<15} {asset['asset_name']}')
+                current_line_length = len(f'{asset["version"]:<15} {asset["asset_name"]}')
+                max_asset_line_length = max(max_asset_line_length, current_line_length)
+
+            print(f'\n{self.color.bold}{"Version":<15} {"Filename"}{self.color.endc}')
+            print('-' * max_asset_line_length)
+            for asset in all_found_assets:
+                print(f'{asset["version"]:<15} {asset["asset_name"]}')
         else:
             print(f'{self.color.byellow}No releases found matching your criteria on this page.{self.color.endc}')
-        print('=' * 50 + '\n')
         sys.exit(0)
 
     def _check_and_download(self, installed_version: version.Version, all_found_assets: list[Any]) -> None:  # pylint: disable=[R0912,R0915]
