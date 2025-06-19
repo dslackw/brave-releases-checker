@@ -71,7 +71,7 @@ class InstalledVersion:
         if brave_package:
             installed_info: str = str(brave_package[0]).rsplit('/', maxsplit=1)[-1]
             version_str: str = installed_info.split('-')[2]
-            self._output_message(f'Installed Package (Slackware): {installed_info}')
+            self._output_message(f'Found Installed Package: {installed_info}')
             return version.parse(version_str)
         self._output_message("Brave Browser package not found for Slackware.", level='info')  # Use info for "not found" which isn't an error
         return None
@@ -88,7 +88,7 @@ class InstalledVersion:
             for line in output.splitlines():
                 if line.startswith('Version:'):
                     version_str: str = line.split(':')[-1].strip()
-                    self._output_message(f'Installed Package (Debian): {self.package_name_prefix} - Version: {version_str}')
+                    self._output_message(f'Found Installed Package: {self.package_name_prefix} - Version: {version_str}')
                     return version.parse(version_str)
             self._output_message(f'Package {self.package_name_prefix} not found or version info missing via dpkg.', level='warning')
         except subprocess.CalledProcessError:
@@ -121,7 +121,7 @@ class InstalledVersion:
             for line in output.splitlines():
                 if line.startswith('installed:'):
                     version_str = line.split()[1]
-                    self._output_message(f'Installed Package (Snap): brave - Version: {version_str}')
+                    self._output_message(f'Found Installed Package: brave - Version: {version_str}')
                     return version.parse(version_str)
             if not version_str:
                 self._output_message('Could not find installed version information in snap info output.', level='warning')
@@ -167,7 +167,7 @@ class InstalledVersion:
                 for line in output.splitlines():
                     if line.startswith('Version'):
                         version_str: str = line.split(':')[-1].strip()
-                        self._output_message(f'Installed Package (Arch): {self.package_name_prefix} - Version: {version_str}')
+                        self._output_message(f'Found Installed Package: {self.package_name_prefix} - Version: {version_str}')
                         return version.parse(version_str)
             self._output_message(f'Package {self.package_name_prefix} not found or version info missing via pacman.', level='warning')
         except subprocess.CalledProcessError:
@@ -188,7 +188,7 @@ class InstalledVersion:
             for line in output.splitlines():
                 if line.startswith('Version'):
                     version_str: str = line.split(':')[1].split('-')[0].strip()
-                    self._output_message(f'Installed Package (openSUSE): {self.package_name_prefix} - Version: {version_str}')
+                    self._output_message(f'Found Installed Package: {self.package_name_prefix} - Version: {version_str}')
                     return version.parse(version_str)
         self._output_message(f'Package {self.package_name_prefix} not found or version info missing via zypper.', level='warning')
         return None
