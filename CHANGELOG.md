@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.5] - 2025-06-19
+## Fixed
+-- **Configuration Parsing (Python 3.9):** Resolved ValueError: invalid literal for int() encountered when running on Python 3.9, which stemmed from configparser incorrectly including inline comments (#) as part of configuration values (e.g., for the pages setting in config.ini). While Python 3.12's configparser handles this gracefully, older versions require comments to be placed on separate lines in .ini files to ensure values are parsed correctly. This fix addresses the underlying issue by clarifying the expected config.ini format for cross-version compatibility.
+
 ## [0.3.4] - 2025-06-19
 ### Fixed
 - **F-string Compatibility:** Resolved a SyntaxError in f-strings that occurred in Python 3.9 (and older) when accessing dictionary keys with nested single quotes. Switched affected f-strings to use double quotes as delimiters for wider Python version compatibility.
