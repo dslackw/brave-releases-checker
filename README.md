@@ -88,10 +88,10 @@ options:
 
     Brave Releases Checker
     ----------------------
-    Channel:         Stable
-    Architecture:    amd64
-    File Suffix:     .deb
-    Checking Page:   1
+    Channel:        Stable
+    Architecture:   amd64
+    File Suffix:    .deb
+    Checking Page:  1
 
     Installed Version: v1.80.110
     Latest Available: v1.80.110 (brave-browser_1.80.110_amd64.deb)

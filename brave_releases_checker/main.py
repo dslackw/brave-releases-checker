@@ -308,11 +308,11 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             print(f'\n{self.color.bold}Brave Releases Checker{self.color.endc}')
             print('-' * (len("Brave Releases Checker")))
 
-            print(f'{self.color.bold}{"Channel:":<{label_max_len}}{self.color.endc} {self.args.channel.capitalize()}')
-            print(f'{self.color.bold}{"Architecture:":<{label_max_len}}{self.color.endc} {self.args.arch}')
-            print(f'{self.color.bold}{"File Suffix:":<{label_max_len}}{self.color.endc} {self.args.suffix}')
-            print(f'{self.color.bold}{"Checking Page:":<{label_max_len}}{self.color.endc} {self.args.pages}')
-            print(f'\n{self.color.bold}Installed Version:{self.color.endc} v{installed_version}')
+            print(f'{self.color.bold}{"Channel:":<{label_max_len}}{self.color.endc}{self.args.channel.capitalize()}')
+            print(f'{self.color.bold}{"Architecture:":<{label_max_len}}{self.color.endc}{self.args.arch}')
+            print(f'{self.color.bold}{"File Suffix:":<{label_max_len}}{self.color.endc}{self.args.suffix}')
+            print(f'{self.color.bold}{"Checking Page:":<{label_max_len}}{self.color.endc}{self.args.pages}')
+            print(f'\n{self.color.bold}Installed Version:{self.color.endc}v{installed_version}')
 
         filtered_assets: list[dict[str, Any]] = []
         if asset_version_arg:
@@ -351,7 +351,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
         if not self.args.daemon:
             print(f'{self.color.bold}Latest Available:{self.color.endc} v{latest_version} ({latest_asset['asset_name']})')
 
-        installed_version = version.parse('1.79.126')
+        # installed_version = version.parse('1.79.126')
         if latest_version > installed_version:
             msg = f'A newer version is available: v{latest_version}'
             if self.args.daemon:
