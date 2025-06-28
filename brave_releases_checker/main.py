@@ -320,7 +320,7 @@ class BraveReleaseChecker:  # pylint: disable=R0902,R0903
             print(f'{self.color.bold}{"Architecture:":<{label_max_len}}{self.color.endc}{self.args.arch}')
             print(f'{self.color.bold}{"File Suffix:":<{label_max_len}}{self.color.endc}{self.args.suffix}')
             print(f'{self.color.bold}{"Checking Page:":<{label_max_len}}{self.color.endc}{self.args.pages}')
-            print(f'\n{self.color.bold}Installed Version:{self.color.endc}v{installed_version}')
+            print(f'\n{self.color.bold}Installed Version: {self.color.endc}v{installed_version}')
 
         filtered_assets: list[dict[str, Any]] = []
         if asset_version_arg:
