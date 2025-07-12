@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.7] - 2025-07-12
+### Added
+- **Visual Update:** The `brc` logo has been added to the README.md, enhancing the project's visual identity and recognition.
+
 ## [0.3.6] - 2025-06-28
 ## Fixed
 - **Refined version number display:** Adjusted the output format to add a space between "Installed Version:" and the version number (e.g., v1.80.113) for improved readability and alignment with the latest version's display.

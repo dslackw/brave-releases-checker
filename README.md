@@ -1,3 +1,5 @@
+![brc Logo](https://raw.githubusercontent.com/dslackw/brave-releases-checker/main/images/brc.png)
+
 # Brave Releases Checker
 
 A simple command-line tool to check for the latest Brave Browser releases from GitHub. It supports selecting a specific channel (stable, beta, nightly), filtering by architecture, file suffix, and even listing all available releases based on your criteria. Configuration can be managed through a config.ini file for persistent settings.
